@@ -34,7 +34,7 @@ class directionController {
             return res.status(500).json({ message: "Upload error" });
         }
     }
-
+  
     async getDirection(req, res) {
         try {
             // let files = await Direction.find({ user: req.user.id });

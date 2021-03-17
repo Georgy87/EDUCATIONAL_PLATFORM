@@ -33,7 +33,7 @@ class courseContentController {
                         },
                     ],
                 });
-
+               
                 const Path = path.join(__dirname, `../static/videos`);
                 fileMv.mv(Path + "/" + fileMv.name);
 

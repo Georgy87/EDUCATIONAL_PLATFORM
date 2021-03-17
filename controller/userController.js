@@ -8,6 +8,7 @@ const mailer = require('../mailer/nodemailer');
 const Uuid = require("uuid");
 const path = require("path");
 
+
 class UserController {
     async registration(req, res) {
         try {
@@ -46,13 +47,13 @@ class UserController {
 
             user.save()
                 .then((data) => {
-                    const message = {
-                        from: "admin@test.com",
-                        to: email,
-                        subject: "Подтверждение почты от Platform",
-                        html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:3000/verify?hash=${data.confirm_hash}">по этой ссылке</a>`,
-                    };
-                    return mailer(message);
+                    // const message = {
+                    //     from: "admin@test.com",
+                    //     to: email,
+                    //     subject: "Подтверждение почты от Platform",
+                    //     html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:3000/verify?hash=${data.confirm_hash}">по этой ссылке</a>`,
+                    // };
+                    // return mailer(message);
                 }).catch((err) => {
                     res.send({ message: err });
                 });
@@ -117,7 +118,7 @@ class UserController {
                     status: 'success',
                     token,
                     user: {
-                        id: user.id,
+                        _id: user.id,
                         email: user.email,
                         name: user.name,
                         surname: user.surname,
@@ -151,7 +152,7 @@ class UserController {
             return res.json({
                 token,
                 user: {
-                    id: user.id,
+                    _id: user.id,
                     email: user.email,
                     name: user.name,
                     surname: user.surname,
@@ -293,7 +294,7 @@ class UserController {
     }
     findUsers = (req, res) => {
         const query = req.query.query;
-        console.log(query);
+
         User.find()
             .or([
                 { fullname: new RegExp(query, "i") },

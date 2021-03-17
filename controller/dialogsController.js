@@ -9,7 +9,7 @@ class DialogController {
     }
 
     show(req, res) {
-        const userId = req.user._id;
+        const userId = req.user.id;
 
         DialogModel.find()
             .or([{ author: userId }, { partner: userId }])
@@ -21,7 +21,6 @@ class DialogController {
                 },
             })
             .exec((err, dialogs) => {
-
                 if (err) {
                     res.status(404).json({
                         message: "Dialogs not found",
@@ -34,8 +33,9 @@ class DialogController {
 
     create = (req, res) => {
         const isOnePartnerOrGroup = "IS_ONE_PARTNER";
+
         const postData = {
-            author: req.user._id,
+            author: req.user.id,
             partner: req.body.partner,
             isOnePartnerOrGroup
         };
@@ -76,7 +76,7 @@ class DialogController {
 
         if (req.body.groupName) {
             const groupData = {
-                author: req.user._id,
+                author: req.user.id,
                 partner: ["6043b8c2ba55502c6739d8fb", "6040f4bc1f99a7b5992d882c", "602ad55a9725bfd6334b398a", "6037c1464206fc81bbce8161"],
                 dialogName: req.body.groupName,
                 isOnePartnerOrGroup
@@ -89,7 +89,7 @@ class DialogController {
                 .then((dialogObj) => {
                     const message = new MessageModel({
                         text: textForCreateGroup,
-                        user: req.user._id,
+                        user: req.user.id,
                         dialog: dialogObj._id
                     });
 

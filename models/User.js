@@ -24,7 +24,6 @@ const User = new Schema({
 );
 
 User.virtual("isOnline").get(function () {
-    console.log(this)
     return differenceInMinutes(parseISO(new Date().toISOString()), this.last_seen) < 2;
 });
 
