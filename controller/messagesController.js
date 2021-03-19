@@ -18,12 +18,13 @@ class MessageController {
                         message: "Messages not found",
                     });
                 }
+                console.log(messages)
                 return res.json(messages);
             });
     }
 
     create = (req, res) => {
-        const userId = req.user._id;
+        const userId = req.user.id;
 
         const postData = {
             text: req.body.text,
@@ -66,7 +67,7 @@ class MessageController {
 
     delete = (req, res) => {
         const id = req.query.id;
-        const userId = req.user._id;
+        const userId = req.user.id;
 
         MessageModel.findById(id, (err, message) => {
             if (err || !message) {

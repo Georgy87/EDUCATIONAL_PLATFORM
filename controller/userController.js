@@ -7,6 +7,7 @@ const config = require("config");
 const mailer = require('../mailer/nodemailer');
 const Uuid = require("uuid");
 const path = require("path");
+const DialogModel = require("../models/Dialogs");
 
 
 class UserController {
@@ -229,12 +230,15 @@ class UserController {
 
     async purchasedCourses(req, res) {
         try {
-            const purchasedCoursesIds = req.body.ids;
+            const purchasedCoursesId = req.body.ids;
+
             const user = await User.findOne({ _id: req.user.id }).exec();
+
             user.purchasedCourses = Array.from(
-                new Set(user.purchasedCourses.concat(purchasedCoursesIds))
+                new Set(user.purchasedCourses.concat(purchasedCoursesId))
             );
-            user.save((err) => {
+
+            user.save((err, userData) => {
                 if (err) {
                     return res.status(404).json({
                         status: "Error add Purchased courses",
@@ -247,11 +251,33 @@ class UserController {
                     message: "Purchased courses added",
                 });
             });
+
+            TeacherCourse.findOne({ _id: purchasedCoursesId }).exec((err, course) => {
+
+                if (err) {
+                    res.status(401).json({
+                        status: "Course not found",
+                        message: err
+                    })
+                }
+
+                if (course.user != req.user.id) {
+                    course.courseUsers = Array.from(
+                        new Set(course.courseUsers.concat(req.user.id))
+                    );
+                }
+
+                DialogModel.findOne({ course: purchasedCoursesId}).exec((err, dialogData) => {
+                    dialogData.partner = course.courseUsers;
+                    dialogData.save();
+                });
+
+                course.save();
+            });
         } catch (error) {
             res.send({ message: "User add purchased courses error" });
         }
     }
-
 
     async uploadAvatar(req, res) {
         try {

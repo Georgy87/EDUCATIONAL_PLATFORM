@@ -5,9 +5,10 @@ const DialogSchema = new Schema(
         partner: [{ type: Schema.Types.ObjectId, ref: "User" }],
         // partner: { type: Schema.Types.ObjectId, ref: "User" },
         author: { type: Schema.Types.ObjectId, ref: "User" },
-        dialogName: { type: String},
+        dialogName: { type: String },
         isOnePartnerOrGroup: { type: String },
         lastMessage: { type: Schema.Types.ObjectId, ref: "Message" },
+        course: { type: Schema.Types.ObjectId, ref: "TeacherCourse" },
     },
     {
         timestamps: true,

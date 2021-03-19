@@ -21,6 +21,7 @@ class courseContentController {
 
                 const modules = new Modules({
                     course: courseId,
+                    user: req.user.id,
                     module: module,
                     moduleHours: 0,
                     moduleMinutes: 0,
@@ -33,7 +34,7 @@ class courseContentController {
                         },
                     ],
                 });
-               
+
                 const Path = path.join(__dirname, `../static/videos`);
                 fileMv.mv(Path + "/" + fileMv.name);
 
@@ -66,7 +67,7 @@ class courseContentController {
         try {
             const courseId = req.query.courseId;
 
-            Modules.find({ course: courseId }).exec((err, course) => {
+            Modules.find({ course: courseId, user: req.user.id }).exec((err, course) => {
                 if (err) {
                     return res.status(404).json({
                         status: "Get content courses error",

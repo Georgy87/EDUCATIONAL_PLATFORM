@@ -43,6 +43,7 @@ const TeacherCourse = new Schema(
             },
         ],
         content: [{ type: Schema.Types.ObjectId, ref: "Modules", require: true }],
+        courseUsers: { type: Array }
     },
     {
         timestamps: true,

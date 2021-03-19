@@ -2,6 +2,7 @@ const { Schema, model, ObjectId } = require("mongoose");
 
 const Lesson = new Schema({
     course: { type: Schema.Types.ObjectId, ref: "TeacherCourse", require: true },
+    user: { type: Schema.Types.ObjectId, ref: "User", require: true },
     module: { type: String },
     moduleHours: { type: Number },
     moduleMinutes: { type: Number },
