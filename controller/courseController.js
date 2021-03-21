@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const TeacherCourse = require("../models/TeacherCourse");
 const { populate } = require("../models/User");
-
+const Modules = require("../models/Modules");
 class courseController {
     async uploadNewCourse(req, res) {
         try {
@@ -427,6 +427,38 @@ class courseController {
                 return res.json(course[0]);
             });
 
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: "Get Course for Training error" });
+        }
+    }
+
+    async checkedLesson(req, res) {
+        try {
+            const { lessonEnd, lessonId, moduleId } = req.body;
+
+            Modules.findOneAndUpdate({ 'moduleContent._id': lessonId }, {
+                $set: { 'moduleContent.$.checkedLesson': lessonEnd }
+            }, (err, module) => {
+                if (err) {
+                    return res.status(404).json({
+                        status: "Checked lesson error",
+                        message: err,
+                    });
+                }
+                module.save(() => {
+                    TeacherCourse.find({ _id: module.course }).populate('user').populate('content').exec((err, course) => {
+                        if (err) {
+                            return res.status(404).json({
+                                status: "Get course for training error",
+                                message: err,
+                            });
+                        }
+                        return res.json(course[0]);
+                    });
+                });
+            });
         } catch (error) {
             return res
                 .status(500)

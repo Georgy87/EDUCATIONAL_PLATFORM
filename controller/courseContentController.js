@@ -30,9 +30,11 @@ class courseContentController {
                         {
                             fileVideo: fileVideo,
                             lesson: lesson,
-                            lessonTime: ''
+                            lessonTime: '',
+                            checkedLesson: false
                         },
                     ],
+
                 });
 
                 const Path = path.join(__dirname, `../static/videos`);
@@ -112,6 +114,7 @@ class courseContentController {
                         lesson,
                         lessonTime: '',
                         linksToResources: [],
+                        checkedLesson: false
                     }
                 }
             }, function (err, result) {

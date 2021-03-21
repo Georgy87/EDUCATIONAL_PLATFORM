@@ -17,5 +17,6 @@ router.post("/comment", authMiddleWare, courseController.createComment);
 router.post("/comment/answer",  authMiddleWare, courseController.createReplyToComment);
 router.get("/comment", courseController.getCommentsForCourse);
 router.get("/comment/answer", authMiddleWare, courseController.getReplyToComment);
+router.post("/checked-lesson", authMiddleWare, courseController.checkedLesson);
 
 module.exports = router;

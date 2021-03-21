@@ -18,6 +18,7 @@ const Lesson = new Schema({
                     linksToResources: { type: String },
                 },
             ],
+            checkedLesson: { type: Boolean, require: true },
         }
     ],
 });
