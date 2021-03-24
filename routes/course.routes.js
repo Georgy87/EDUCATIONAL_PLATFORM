@@ -18,5 +18,6 @@ router.post("/comment/answer",  authMiddleWare, courseController.createReplyToCo
 router.get("/comment", courseController.getCommentsForCourse);
 router.get("/comment/answer", authMiddleWare, courseController.getReplyToComment);
 router.post("/checked-lesson", authMiddleWare, courseController.checkedLesson);
+router.post("/test", authMiddleWare, courseController.createTestForCourse);
 
 module.exports = router;

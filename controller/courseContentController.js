@@ -34,14 +34,12 @@ class courseContentController {
                             checkedLesson: false
                         },
                     ],
-
                 });
 
                 const Path = path.join(__dirname, `../static/videos`);
                 fileMv.mv(Path + "/" + fileMv.name);
 
                 modules.save((err, dataModule) => {
-
                     TeacherCourse.findOneAndUpdate({ _id: courseId }, {
                         $push: { 'content': dataModule._id.toString() }
                     }, (err, data) => {
@@ -56,6 +54,7 @@ class courseContentController {
                         });
                     });
                 })
+
             }
         } catch (e) {
             console.log(e);
@@ -114,7 +113,7 @@ class courseContentController {
                         lesson,
                         lessonTime: '',
                         linksToResources: [],
-                        checkedLesson: false
+                        checkedLesson: false,
                     }
                 }
             }, function (err, result) {
@@ -137,6 +136,7 @@ class courseContentController {
                     return res.json({ content: course });
                 });
             });
+
         } catch (e) {
             return res.status(500).json({ message: "error" });
         }
@@ -253,6 +253,7 @@ class courseContentController {
                         message: err,
                     });
                 }
+                console.log(hours, minutes);
 
                 module.moduleHours += hours;
                 module.moduleMinutes += minutes;

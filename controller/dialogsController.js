@@ -82,7 +82,7 @@ class DialogController {
                     message: err
                 })
             }
-
+            
             if (req.body.groupName && course.courseUsers.length > 0) {
                 const groupData = {
                     author: req.user.id,

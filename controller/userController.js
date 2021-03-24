@@ -253,7 +253,6 @@ class UserController {
             });
 
             TeacherCourse.findOne({ _id: purchasedCoursesId }).exec((err, course) => {
-
                 if (err) {
                     res.status(401).json({
                         status: "Course not found",
@@ -268,8 +267,10 @@ class UserController {
                 }
 
                 DialogModel.findOne({ course: purchasedCoursesId}).exec((err, dialogData) => {
-                    dialogData.partner = course.courseUsers;
-                    dialogData.save();
+                    if(dialogData) {
+                        dialogData.partner = course.courseUsers;
+                        dialogData.save();
+                    }
                 });
 
                 course.save();

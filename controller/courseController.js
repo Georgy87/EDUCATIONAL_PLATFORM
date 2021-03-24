@@ -403,6 +403,7 @@ class courseController {
                             message: err
                         });
                     }
+                    console.log(courses);
                     return res.json([...courses]);
                 });
             });
@@ -438,6 +439,12 @@ class courseController {
         try {
             const { lessonEnd, lessonId, moduleId } = req.body;
 
+            // const checkLesson = new CheckedLessonModel({
+            //     checked: lessonEnd
+            // });
+
+            // checkLesson.save();
+
             Modules.findOneAndUpdate({ 'moduleContent._id': lessonId }, {
                 $set: { 'moduleContent.$.checkedLesson': lessonEnd }
             }, (err, module) => {
@@ -459,10 +466,38 @@ class courseController {
                     });
                 });
             });
+
         } catch (error) {
             return res
                 .status(500)
                 .json({ message: "Get Course for Training error" });
+        }
+    }
+
+    async createTestForCourse(req, res) {
+        try {
+            const { courseId, questionText, answerOptions } = req.body;
+            console.log(courseId, questionText, answerOptions)
+            TeacherCourse.findOneAndUpdate({ _id: courseId }, {
+                $push: {
+                    courseTest: {
+                        questionText: questionText,
+                        answerOptions: [...answerOptions],
+                    }
+                }
+            }, (err, course) => {
+                if (err) {
+                    return res.status(403).json({
+                        status: 'Create test for course error',
+                        message: 'error',
+                    });
+                }
+                course.save();
+            });
+        } catch (error) {
+            return res
+            .status(500)
+            .json({ message: 'Tests for course error' });
         }
     }
 }
