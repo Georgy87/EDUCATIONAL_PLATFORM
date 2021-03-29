@@ -8,8 +8,38 @@ class MessageController {
         this.io = io;
     }
 
+    updateReadStatus = (
+        res,
+        userId,
+        dialogId
+    ) => {
+        console.log(userId,
+            dialogId)
+        MessageModel.updateMany(
+            { dialog: dialogId, user: { $ne: userId } },
+            { $set: { read: true }},
+            (err) => {
+                if (err) {
+                    res.status(500).json({
+                        status: "error",
+                        message: err,
+                    });
+                } else {
+                    this.io.emit("SERVER:MESSAGES_READED", {
+                        userId,
+                        dialogId,
+                    });
+                }
+            }
+        );
+    };
+
     show = (req, res) => {
         const dialogId = req.query.dialog;
+        const userId = req.user.id;
+
+        this.updateReadStatus(res, userId, dialogId);
+
         MessageModel.find({ dialog: dialogId })
             .populate(["dialog", "user"])
             .exec((err, messages) => {
@@ -18,7 +48,7 @@ class MessageController {
                         message: "Messages not found",
                     });
                 }
-                console.log(messages)
+
                 return res.json(messages);
             });
     }
@@ -104,8 +134,10 @@ class MessageController {
                                     message: err,
                                 });
                             }
+                            if (lastMessage) {
+                                dialog.lastMessage = lastMessage._id.toString();
+                            }
 
-                            dialog.lastMessage = lastMessage._id.toString();
                             dialog.save();
                             this.io.emit("SERVER:DIALOG_CREATED");
                         });

@@ -403,7 +403,6 @@ class courseController {
                             message: err
                         });
                     }
-                    console.log(courses);
                     return res.json([...courses]);
                 });
             });
@@ -477,7 +476,7 @@ class courseController {
     async createTestForCourse(req, res) {
         try {
             const { courseId, questionText, answerOptions } = req.body;
-            console.log(courseId, questionText, answerOptions)
+
             TeacherCourse.findOneAndUpdate({ _id: courseId }, {
                 $push: {
                     courseTest: {
@@ -498,6 +497,22 @@ class courseController {
             return res
             .status(500)
             .json({ message: 'Tests for course error' });
+        }
+    }
+
+    async getTestForCourse(req, res) {
+        try {
+            TeacherCourse.findOne({ _id: req.query.courseId}).exec((err, course) => {
+                const questions = course.courseTest;
+                res.json({
+                    status: 'success',
+                    questions
+                });
+            });
+        } catch (error) {
+            return res
+            .status(500)
+            .json({ message: 'Get tests for course error' });
         }
     }
 }

@@ -259,8 +259,9 @@ class UserController {
                         message: err
                     })
                 }
-
+              
                 if (course.user != req.user.id) {
+
                     course.courseUsers = Array.from(
                         new Set(course.courseUsers.concat(req.user.id))
                     );

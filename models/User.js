@@ -24,7 +24,7 @@ const User = new Schema({
 );
 
 User.virtual("isOnline").get(function () {
-    return differenceInMinutes(parseISO(new Date().toISOString()), this.last_seen) < 2;
+    return differenceInMinutes(parseISO(new Date().toISOString()), this.last_seen) < 5;
 });
 
 User.set("toJSON", {
