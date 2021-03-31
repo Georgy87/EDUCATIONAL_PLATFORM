@@ -257,37 +257,38 @@ class courseController {
             const { courseId, commentId } = req.query;
             const userId = req.user.id;
 
-            TeacherCourse.findOne({ _id: courseId }).exec(function (err, course) {
-                course.comments.map(async (el) => {
-                    if (el._id.toString() === commentId) {
-                        el.comments.push({
-                            text: text,
-                            user: userId,
-                        });
+            Comments.findOne({ _id: commentId }).exec(function (err, comment) {
+                console.log(comment);
+                // course.comments.map(async (el) => {
+                //     if (el._id.toString() === commentId) {
+                //         el.comments.push({
+                //             text: text,
+                //             user: userId,
+                //         });
 
-                        course.save(async (err) => {
-                            if (err) {
-                                return res.status(400).json({
-                                    status: 'Create comment error',
-                                    message: err
-                                });
-                            }
+                //         course.save(async (err) => {
+                //             if (err) {
+                //                 return res.status(400).json({
+                //                     status: 'Create comment error',
+                //                     message: err
+                //                 });
+                //             }
 
-                            const data = await course
-                                .populate("comments.user")
-                                .populate("comments.comments.user")
-                                .execPopulate();
+                //             const data = await course
+                //                 .populate("comments.user")
+                //                 .populate("comments.comments.user")
+                //                 .execPopulate();
 
-                            data.comments.map((el) => {
-                                if (el._id.toString() === commentId) {
-                                    return res.json({
-                                        data: el,
-                                    });
-                                }
-                            });
-                        });
-                    }
-                });
+                //             data.comments.map((el) => {
+                //                 if (el._id.toString() === commentId) {
+                //                     return res.json({
+                //                         data: el,
+                //                     });
+                //                 }
+                //             });
+                //         });
+                //     }
+                // });
             });
         } catch (e) {
             console.log(e);
@@ -326,6 +327,36 @@ class courseController {
                                 data: data,
                             });
                         }
+                    });
+                });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async getReplyToCommentNew(req, res) {
+        try {
+            const { courseId, commentId } = req.query;
+            Comments.findOne({ _id: commentId })
+                .populate("user")
+                .populate("comments.user")
+                .exec(function (err, comment) {
+                    if (err) {
+                        res.status(404).json({
+                            status: 'Comments not found',
+                            message: err
+                        });
+                    }
+                    console.log(comment);
+                    // course.comments.map((data) => {
+                    //     if (data._id.toString() === commentId) {
+                    //         return res.json({
+                    //             data: data,
+                    //         });
+                    //     }
+                    // });
+                    return res.json({
+                        data: comment,
                     });
                 });
         } catch (e) {
