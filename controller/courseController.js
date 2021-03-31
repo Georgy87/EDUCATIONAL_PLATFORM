@@ -232,7 +232,7 @@ class courseController {
                 Comments.find({ courseId: courseId })
                     .populate("user")
                     .populate("comments.user")
-                    .sort({'created': -1})
+                    .sort({ 'created': -1 })
                     .exec((err, comments) => {
                         if (err) {
                             return res.status(404).json({
@@ -297,13 +297,14 @@ class courseController {
     async getCommentsForCourse(req, res) {
         try {
             const { courseId } = req.query;
-            TeacherCourse.findOne({ _id: courseId })
+            Comments.find({ courseId })
+                .populate("user")
                 .populate("comments.user")
-                .populate("comments.comments.user")
+                .sort({ 'created': -1 })
                 .exec(function (err, data) {
                     if (data) {
                         return res.json({
-                            data: data.comments,
+                            data: data,
                         });
                     }
                 });
