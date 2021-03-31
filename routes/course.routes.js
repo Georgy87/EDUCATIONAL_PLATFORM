@@ -13,7 +13,7 @@ router.get("/shopping-cart", authMiddleWare, courseController.getCoursesForShopp
 router.delete("/delete-shopping-cart", authMiddleWare, courseController.deleteCoursesForShoppingCart);
 router.get("/purchased-courses", authMiddleWare, courseController.getPurchasedCourses);
 router.get("/training-course", authMiddleWare, courseController.getCourseForTraining);
-router.post("/comment", authMiddleWare, courseController.createComment);
+router.post("/comment", authMiddleWare, courseController.createCommentNew);
 router.post("/comment/answer",  authMiddleWare, courseController.createReplyToComment);
 router.get("/comment", courseController.getCommentsForCourse);
 router.get("/comment/answer", authMiddleWare, courseController.getReplyToComment);

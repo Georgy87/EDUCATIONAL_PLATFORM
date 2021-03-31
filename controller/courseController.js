@@ -7,8 +7,8 @@ const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const TeacherCourse = require("../models/TeacherCourse");
-const { populate } = require("../models/User");
 const Modules = require("../models/Modules");
+const Comments = require("../models/Comments");
 class courseController {
     async uploadNewCourse(req, res) {
         try {
@@ -186,6 +186,66 @@ class courseController {
                         });
                     });
                 });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async createCommentNew(req, res) {
+        try {
+            let file;
+            const photoName = Uuid.v4() + ".jpg";
+
+            if (req.files) {
+                file = req.files.file;
+                const Path = path.join(__dirname, `../static/commentPhotos`);
+                file.mv(Path + "/" + photoName);
+            }
+
+            const { courseId, text } = req.body;
+
+            let Comment;
+
+            if (req.files) {
+                Comment = new Comments({
+                    text: text,
+                    photo: photoName,
+                    user: req.user.id,
+                    courseId,
+                });
+            } else {
+                Comment = new Comments({
+                    text: text,
+                    user: req.user.id,
+                    courseId,
+                });
+            }
+
+            Comment.save(async (err) => {
+                if (err) {
+                    return res.status(400).json({
+                        status: 'Create comment error',
+                        message: err
+                    });
+                }
+
+                Comments.find({ courseId: courseId })
+                    .populate("user")
+                    .populate("comments.user")
+                    .sort({'created': -1})
+                    .exec((err, comments) => {
+                        if (err) {
+                            return res.status(404).json({
+                                status: 'Comments not found',
+                                message: err
+                            });
+                        }
+                        return res.json({
+                            status: "success",
+                            data: comments
+                        });
+                    });
+            });
         } catch (e) {
             console.log(e);
         }
@@ -495,14 +555,14 @@ class courseController {
             });
         } catch (error) {
             return res
-            .status(500)
-            .json({ message: 'Tests for course error' });
+                .status(500)
+                .json({ message: 'Tests for course error' });
         }
     }
 
     async getTestForCourse(req, res) {
         try {
-            TeacherCourse.findOne({ _id: req.query.courseId}).exec((err, course) => {
+            TeacherCourse.findOne({ _id: req.query.courseId }).exec((err, course) => {
                 const questions = course.courseTest;
                 res.json({
                     status: 'success',
@@ -511,8 +571,8 @@ class courseController {
             });
         } catch (error) {
             return res
-            .status(500)
-            .json({ message: 'Get tests for course error' });
+                .status(500)
+                .json({ message: 'Get tests for course error' });
         }
     }
 }
