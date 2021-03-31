@@ -135,62 +135,6 @@ class courseController {
         }
     }
 
-    async createComment(req, res) {
-        try {
-            let file;
-            const photoName = Uuid.v4() + ".jpg";
-
-            if (req.files) {
-                file = req.files.file;
-                const Path = path.join(__dirname, `../static/commentPhotos`);
-                file.mv(Path + "/" + photoName);
-            }
-
-            const { courseId, text } = req.body;
-
-            TeacherCourse.findOne({
-                _id: courseId,
-            })
-                .select(
-                    "-content -smallDescription -fullDescription -profession -competence -user -author -price -__v"
-                )
-                .exec(async function (err, course) {
-                    if (req.files) {
-                        course.comments.unshift({
-                            text: text,
-                            photo: photoName,
-                            user: req.user.id,
-                        });
-                    } else {
-                        course.comments.unshift({
-                            text: text,
-                            user: req.user.id,
-                        });
-                    }
-                    course.save(async (err) => {
-                        if (err) {
-                            return res.status(400).json({
-                                status: 'Create comment error',
-                                message: err
-                            });
-                        }
-
-                        const data = await course
-                            .populate("comments.user")
-                            .populate("comments.comments.user")
-                            .execPopulate();
-
-                        return res.json({
-                            status: "success",
-                            data: data,
-                        });
-                    });
-                });
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
     async createCommentNew(req, res) {
         try {
             let file;
@@ -251,44 +195,37 @@ class courseController {
         }
     }
 
-    async createReplyToComment(req, res) {
+    async createReplyToCommentNew(req, res) {
         try {
             const { text } = req.body;
             const { courseId, commentId } = req.query;
             const userId = req.user.id;
 
-            Comments.findOne({ _id: commentId }).exec(function (err, comment) {
-                console.log(comment);
-                // course.comments.map(async (el) => {
-                //     if (el._id.toString() === commentId) {
-                //         el.comments.push({
-                //             text: text,
-                //             user: userId,
-                //         });
+            Comments.findOneAndUpdate({ _id: commentId }, {
+                $push: {
+                    comments: {
+                        text: text,
+                        user: userId,
+                    }
+                }
+            }, function (err, comment) {
+                if (err) {
+                    return res.status(400).json({
+                        status: 'Create comment error',
+                        message: err
+                    });
+                }
+                Comments.findOne({ _id: commentId })
+                    .populate("user")
+                    .populate("comments.user")
+                    .exec(function (err, comment) {
+                        console.log(comment);
 
-                //         course.save(async (err) => {
-                //             if (err) {
-                //                 return res.status(400).json({
-                //                     status: 'Create comment error',
-                //                     message: err
-                //                 });
-                //             }
+                        return res.json({
+                            data: comment,
+                        });
 
-                //             const data = await course
-                //                 .populate("comments.user")
-                //                 .populate("comments.comments.user")
-                //                 .execPopulate();
-
-                //             data.comments.map((el) => {
-                //                 if (el._id.toString() === commentId) {
-                //                     return res.json({
-                //                         data: el,
-                //                     });
-                //                 }
-                //             });
-                //         });
-                //     }
-                // });
+                    });
             });
         } catch (e) {
             console.log(e);
@@ -314,29 +251,30 @@ class courseController {
         }
     }
 
-    async getReplyToComment(req, res) {
-        try {
-            const { courseId, commentId } = req.query;
-            TeacherCourse.findOne({ _id: courseId })
-                .populate("comments.user")
-                .populate("comments.comments.user")
-                .exec(function (err, course) {
-                    course.comments.map((data) => {
-                        if (data._id.toString() === commentId) {
-                            return res.json({
-                                data: data,
-                            });
-                        }
-                    });
-                });
-        } catch (e) {
-            console.log(e);
-        }
-    }
+    // async getReplyToComment(req, res) {
+    //     try {
+    //         const { courseId, commentId } = req.query;
+    //         TeacherCourse.findOne({ _id: courseId })
+    //             .populate("comments.user")
+    //             .populate("comments.comments.user")
+    //             .exec(function (err, course) {
+    //                 course.comments.map((data) => {
+    //                     if (data._id.toString() === commentId) {
+    //                         return res.json({
+    //                             data: data,
+    //                         });
+    //                     }
+    //                 });
+    //             });
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
 
     async getReplyToCommentNew(req, res) {
         try {
-            const { courseId, commentId } = req.query;
+            const { commentId } = req.query;
+
             Comments.findOne({ _id: commentId })
                 .populate("user")
                 .populate("comments.user")
@@ -347,14 +285,6 @@ class courseController {
                             message: err
                         });
                     }
-                    console.log(comment);
-                    // course.comments.map((data) => {
-                    //     if (data._id.toString() === commentId) {
-                    //         return res.json({
-                    //             data: data,
-                    //         });
-                    //     }
-                    // });
                     return res.json({
                         data: comment,
                     });

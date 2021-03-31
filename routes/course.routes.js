@@ -15,7 +15,7 @@ router.get("/purchased-courses", authMiddleWare, courseController.getPurchasedCo
 router.get("/training-course", authMiddleWare, courseController.getCourseForTraining);
 
 router.post("/comment", authMiddleWare, courseController.createCommentNew);
-router.post("/comment/answer",  authMiddleWare, courseController.createReplyToComment);
+router.post("/comment/answer",  authMiddleWare, courseController.createReplyToCommentNew);
 router.get("/comment", courseController.getCommentsForCourse);
 router.get("/comment/answer", authMiddleWare, courseController.getReplyToCommentNew);
 
