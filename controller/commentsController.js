@@ -2,9 +2,10 @@
 const Comments = require("../models/Comments");
 const Uuid = require("uuid");
 const path = require("path");
+const fs = require("fs");
 
 class commentsController {
-    async createCommentNew(req, res) {
+    async createComment(req, res) {
         try {
             let file;
             const photoName = Uuid.v4() + ".jpg";
@@ -64,7 +65,44 @@ class commentsController {
         }
     }
 
-    async createReplyToCommentNew(req, res) {
+    async deleteComment(req, res) {
+        try {
+            const { courseId, commentId } = req.query;
+
+            Comments.findOne({ _id: commentId }).exec((err, data) => {
+                if (err) {
+                    return res.status(404).json({
+                        status: 'Comments not found',
+                        message: err
+                    });
+                }
+
+                if (req.query.photoName != 'undefined') {
+                    const Path = path.join(
+                        __dirname,
+                        `../static/commentPhotos/${req.query.photoName}`
+                    );
+                    if (Path) {
+                        fs.unlinkSync(Path);
+                    }
+                }
+
+                if (data) {
+                    data.delete();
+                }
+
+                Comments.find({ courseId }).populate(['user', 'comments.user']).exec((err, data) => {
+                    return res.json({
+                        data: data,
+                    });
+                });
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async createReplyToComment(req, res) {
         try {
             const { text } = req.body;
             const { courseId, commentId } = req.query;
@@ -120,7 +158,7 @@ class commentsController {
         }
     }
 
-    async getReplyToCommentNew(req, res) {
+    async getReplyToComment(req, res) {
         try {
             const { commentId } = req.query;
 

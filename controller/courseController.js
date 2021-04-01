@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const TeacherCourse = require("../models/TeacherCourse");
 const Modules = require("../models/Modules");
-
+const Comments = require("../models/Comments");
 class courseController {
     async uploadNewCourse(req, res) {
         try {
