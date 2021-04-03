@@ -40,6 +40,7 @@ module.exports.createUseApp = (app, io) => {
 
     app.use(express.static("static/coursePhotos"));
     app.use(express.static("static/commentPhotos"));
+    app.use(express.static("static/replyToCommentPhoto"));
     app.use(express.static("static"));
     app.use(express.static("static/directions"));
     app.use(express.static("static/avatars"));

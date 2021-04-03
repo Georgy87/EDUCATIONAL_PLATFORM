@@ -65,6 +65,8 @@ class commentsController {
         }
     }
 
+
+
     async deleteComment(req, res) {
         try {
             const { courseId, commentId } = req.query;
@@ -104,36 +106,49 @@ class commentsController {
 
     async createReplyToComment(req, res) {
         try {
-            const { text } = req.body;
-            const { courseId, commentId } = req.query;
+            const { text, commentId } = req.body;
             const userId = req.user.id;
 
-            Comments.findOneAndUpdate({ _id: commentId }, {
-                $push: {
-                    comments: {
-                        text: text,
-                        user: userId,
+            let file;
+            const photoName = Uuid.v4() + ".jpg";
+
+            if (req.files) {
+                file = req.files.file;
+                const Path = path.join(__dirname, `../static/replyToCommentPhoto`);
+                file.mv(Path + "/" + photoName);
+            }
+            // console.log( text, commentId, file);
+
+            if (req.files) {
+                console.log(req.files);
+                Comments.findOneAndUpdate({ _id: commentId }, {
+                    $push: {
+                        comments: {
+                            text: text,
+                            user: userId,
+                            photo: photoName,
+                        }
                     }
-                }
-            }, function (err, comment) {
-                if (err) {
-                    return res.status(400).json({
-                        status: 'Create comment error',
-                        message: err
-                    });
-                }
-                Comments.findOne({ _id: commentId })
-                    .populate("user")
-                    .populate("comments.user")
-                    .exec(function (err, comment) {
-                        console.log(comment);
-
-                        return res.json({
-                            data: comment,
+                }, function (err, comment) {
+                    if (err) {
+                        return res.status(400).json({
+                            status: 'Create comment error',
+                            message: err
                         });
+                    }
+                    Comments.findOne({ _id: commentId })
+                        .populate("user")
+                        .populate("comments.user")
+                        .exec(function (err, comment) {
+                            console.log(comment);
 
-                    });
-            });
+                            return res.json({
+                                data: comment,
+                            });
+                        });
+                });
+            }
+
         } catch (e) {
             console.log(e);
         }
