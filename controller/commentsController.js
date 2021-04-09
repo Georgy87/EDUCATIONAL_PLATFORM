@@ -104,6 +104,52 @@ class commentsController {
         }
     }
 
+    async deleteReplyToComment(req, res) {
+        try {
+            const { courseId, commentId } = req.query;
+
+            Comments.findOneAndUpdate({ _id: commentId }, {
+                $pull: {
+                    comments: { _id: commentId },
+                }
+            }, ((err, data) => {
+                if (err) {
+                    return res.status(404).json({
+                        status: 'Reply to comments not found',
+                        message: err
+                    });
+                }
+
+                if (req.query.photoName != 'undefined') {
+                    const Path = path.join(
+                        __dirname,
+                        `../static/replyToCommentPhoto/${req.query.photoName}`
+                    );
+                    if (Path) {
+                        fs.unlinkSync(Path);
+                    }
+                }
+
+                if (data) {
+                    data.delete();
+                }
+
+                Comments.findOne({ _id: commentId })
+                .populate("user")
+                .populate("comments.user")
+                .exec(function (err, comment) {
+                    console.log(comment);
+
+                    return res.json({
+                        data: comment,
+                    });
+                });
+            }));
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     async createReplyToComment(req, res) {
         try {
             const { text, commentId } = req.body;

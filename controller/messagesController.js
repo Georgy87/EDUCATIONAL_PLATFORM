@@ -134,6 +134,7 @@ class MessageController {
                                     message: err,
                                 });
                             }
+                            
                             if (lastMessage) {
                                 dialog.lastMessage = lastMessage._id.toString();
                             }
