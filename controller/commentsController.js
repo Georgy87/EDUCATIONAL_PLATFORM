@@ -65,8 +65,6 @@ class commentsController {
         }
     }
 
-
-
     async deleteComment(req, res) {
         try {
             const { courseId, commentId } = req.query;
@@ -90,14 +88,16 @@ class commentsController {
                 }
 
                 if (data) {
-                    data.delete();
-                }
-
-                Comments.find({ courseId }).populate(['user', 'comments.user']).exec((err, data) => {
-                    return res.json({
-                        data: data,
+                    data.deleteOne(() => {
+                        Comments.find({ courseId })
+                            .populate("user")
+                            .populate("comments.user").exec((err, data) => {
+                                return res.json({
+                                    data: data,
+                                });
+                            });
                     });
-                });
+                }
             });
         } catch (e) {
             console.log(e);
@@ -106,13 +106,13 @@ class commentsController {
 
     async deleteReplyToComment(req, res) {
         try {
-            const { courseId, commentId } = req.query;
+            const { commentId, replyId } = req.query;
 
-            Comments.findOneAndUpdate({ _id: commentId }, {
+            Comments.findOneAndUpdate({ _id: replyId }, {
                 $pull: {
                     comments: { _id: commentId },
                 }
-            }, ((err, data) => {
+            }, function (err, data) {
                 if (err) {
                     return res.status(404).json({
                         status: 'Reply to comments not found',
@@ -130,21 +130,17 @@ class commentsController {
                     }
                 }
 
-                if (data) {
-                    data.delete();
-                }
+                Comments.findOne({ _id: replyId })
+                    .populate("user")
+                    .populate("comments.user")
+                    .exec(function (err, comment) {
+                        console.log(comment);
 
-                Comments.findOne({ _id: commentId })
-                .populate("user")
-                .populate("comments.user")
-                .exec(function (err, comment) {
-                    console.log(comment);
-
-                    return res.json({
-                        data: comment,
+                        return res.json({
+                            data: comment,
+                        });
                     });
-                });
-            }));
+            });
         } catch (e) {
             console.log(e);
         }
@@ -166,7 +162,6 @@ class commentsController {
             // console.log( text, commentId, file);
 
             if (req.files) {
-                console.log(req.files);
                 Comments.findOneAndUpdate({ _id: commentId }, {
                     $push: {
                         comments: {
@@ -182,11 +177,11 @@ class commentsController {
                             message: err
                         });
                     }
+
                     Comments.findOne({ _id: commentId })
                         .populate("user")
                         .populate("comments.user")
                         .exec(function (err, comment) {
-                            console.log(comment);
 
                             return res.json({
                                 data: comment,

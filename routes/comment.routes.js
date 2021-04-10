@@ -8,5 +8,6 @@ router.post("/comment/answer", authMiddleWare, commentsController.createReplyToC
 router.get("/comment",  commentsController.getCommentsForCourse);
 router.get("/comment/answer", authMiddleWare, commentsController.getReplyToComment);
 router.delete("/comment", authMiddleWare, commentsController.deleteComment);
+router.delete("/comment/reply", authMiddleWare, commentsController.deleteReplyToComment);
 
 module.exports = router;

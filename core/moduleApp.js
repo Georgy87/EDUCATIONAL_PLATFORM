@@ -8,6 +8,7 @@ const fileUpload = require("express-fileupload");
 const corsmiddleware = require("../middleware/cors.middleware");
 const DialogController = require('../controller/dialogsController');
 const MessagesController = require('../controller/messagesController');
+const lastSeenMiddleware = require("../middleware/updateLastSeen.middleware");
 
 const authMiddleWare = require("../middleware/auth.middleware");
 
@@ -27,14 +28,14 @@ module.exports.createUseApp = (app, io) => {
 
     // Доработать
 
-    app.get("/api/dialogs", authMiddleWare, DialogCtrl.show);
-    app.delete("/api/dialogs/:id", authMiddleWare, DialogCtrl.delete);
-    app.post("/api/dialogs", authMiddleWare, DialogCtrl.create);
-    app.post("/api/dialogs/group", authMiddleWare, DialogCtrl.createGroup);
+    app.get("/api/dialogs", authMiddleWare, lastSeenMiddleware, DialogCtrl.show);
+    app.delete("/api/dialogs/:id", authMiddleWare, lastSeenMiddleware, DialogCtrl.delete);
+    app.post("/api/dialogs", authMiddleWare, lastSeenMiddleware, DialogCtrl.create);
+    app.post("/api/dialogs/group", authMiddleWare, lastSeenMiddleware, DialogCtrl.createGroup);
 
     // Доработать
 
-    app.get("/api/messages", authMiddleWare, MessageCtrl.show);
+    app.get("/api/messages", authMiddleWare, lastSeenMiddleware, MessageCtrl.show);
     app.post("/api/messages", authMiddleWare, MessageCtrl.create);
     app.delete("/api/messages?:id", authMiddleWare, MessageCtrl.delete);
 
