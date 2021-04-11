@@ -11,39 +11,9 @@ const TeacherCourse = new Schema(
         fullDescription: { type: String },
         user: { type: ObjectId, ref: "User" },
         avatar: { type: String },
-        // comments: [
-        //     {
-        //         text: { type: String },
-        //         photo: { type: String },
-        //         user: {
-        //             required: true,
-        //             ref: "User",
-        //             type: Schema.Types.ObjectId,
-        //         },
-        //         created: {
-        //             type: Date,
-        //             default: Date.now
-        //         },
-        //         comments: [
-        //             {
-        //                 text: { type: String },
-        //                 photo: { type: String },
-        //                 user: {
-        //                     required: true,
-        //                     ref: "User",
-        //                     type: Schema.Types.ObjectId,
-        //                     trim: true
-        //                 },
-        //                 created: {
-        //                     type: Date,
-        //                     default: Date.now
-        //                 },
-        //             },
-        //         ],
-        //     },
-        // ],
         content: [{ type: Schema.Types.ObjectId, ref: "Modules", require: true }],
         courseUsers: { type: Array },
+        courseLessonsVideo: { type: Array },
         courseTest: [
             {
                 questionText: String,

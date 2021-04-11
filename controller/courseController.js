@@ -378,6 +378,50 @@ class courseController {
                 .json({ message: 'Get tests for course error' });
         }
     }
+
+    async setVideoList(req, res) {
+        try {
+            const { videoNames } = req.body;
+            console.log(videoNames);
+            TeacherCourse.findOneAndUpdate({ _id: req.query.courseId }, {
+                $set: {
+                    courseLessonsVideo: videoNames
+                }
+            }, (err, data) => {
+                console.log(data);
+                if (err) {
+                    return res.status(404).json({
+                        status: "Course not found",
+                        message: err,
+                    });
+                }
+            });
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: 'Set video list error' });
+        }
+    }
+
+    async getLessonName(req, res) {
+        try {
+            const { courseId, count } = req.query;
+
+            TeacherCourse.findOne({ _id: courseId }, (err, course) => {
+                console.log(course);
+                if (err) {
+                    return res.status(404).json({
+                        status: "Course not found",
+                        message: err,
+                    });
+                }
+            });
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: 'Set video list error' });
+        }
+    }
 }
 
 module.exports = new courseController();

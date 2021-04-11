@@ -16,5 +16,7 @@ router.get("/training-course", authMiddleWare, courseController.getCourseForTrai
 router.post("/checked-lesson", authMiddleWare, courseController.checkedLesson);
 router.post("/test", authMiddleWare, courseController.createTestForCourse);
 router.get("/test", authMiddleWare, courseController.getTestForCourse);
+router.post("/set-videos", authMiddleWare, courseController.setVideoList);
+router.post("/lesson-name", authMiddleWare, courseController.getLessonName);
 
 module.exports = router;
