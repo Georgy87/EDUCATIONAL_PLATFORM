@@ -408,7 +408,7 @@ class courseController {
             const { courseId, count } = req.query;
 
             TeacherCourse.findOne({ _id: courseId }, (err, course) => {
-                console.log(course);
+                console.log(course.courseLessonsVideo);
                 if (err) {
                     return res.status(404).json({
                         status: "Course not found",
