@@ -382,13 +382,12 @@ class courseController {
     async setVideoList(req, res) {
         try {
             const { videoNames } = req.body;
-            console.log(videoNames);
+
             TeacherCourse.findOneAndUpdate({ _id: req.query.courseId }, {
-                $set: {
+                $addToSet: {
                     courseLessonsVideo: videoNames
                 }
             }, (err, data) => {
-                console.log(data);
                 if (err) {
                     return res.status(404).json({
                         status: "Course not found",
@@ -407,14 +406,26 @@ class courseController {
         try {
             const { courseId, count } = req.query;
 
+            let countVideo = count;
+
             TeacherCourse.findOne({ _id: courseId }, (err, course) => {
-                console.log(course.courseLessonsVideo);
+                let lessonName;
+
+                lessonName = course.courseLessonsVideo.splice(count);
+
+                const [name] = lessonName;
+
                 if (err) {
                     return res.status(404).json({
                         status: "Course not found",
                         message: err,
                     });
                 }
+
+                res.json({
+                    status: 'success',
+                    lessonName: name,
+                });
             });
         } catch (error) {
             return res

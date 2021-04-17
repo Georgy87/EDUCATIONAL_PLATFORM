@@ -253,7 +253,7 @@ class courseContentController {
                         message: err,
                     });
                 }
-                console.log(hours, minutes);
+            
 
                 module.moduleHours += hours;
                 module.moduleMinutes += minutes;
