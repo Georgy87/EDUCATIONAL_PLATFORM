@@ -14,6 +14,7 @@ const TeacherCourse = new Schema(
         content: [{ type: Schema.Types.ObjectId, ref: "Modules", require: true }],
         courseUsers: { type: Array },
         courseLessonsVideo: { type: Array },
+        lessonVideo: { type: String, require: true },
         courseTest: [
             {
                 questionText: String,

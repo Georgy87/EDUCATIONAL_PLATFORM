@@ -384,17 +384,16 @@ class courseController {
             const { videoNames } = req.body;
 
             TeacherCourse.findOneAndUpdate({ _id: req.query.courseId }, {
-                $addToSet: {
-                    courseLessonsVideo: videoNames
-                }
-            }, (err, data) => {
+                $set: { courseLessonsVideo: videoNames }
+            }, (err, course) => {
+
                 if (err) {
                     return res.status(404).json({
                         status: "Course not found",
                         message: err,
                     });
                 }
-            });
+            })
         } catch (error) {
             return res
                 .status(500)
@@ -405,12 +404,8 @@ class courseController {
     async getLessonName(req, res) {
         try {
             const { courseId, count } = req.query;
-
-            let countVideo = count;
-
+            let lessonName;
             TeacherCourse.findOne({ _id: courseId }, (err, course) => {
-                let lessonName;
-
                 lessonName = course.courseLessonsVideo.splice(count);
 
                 const [name] = lessonName;
@@ -422,9 +417,20 @@ class courseController {
                     });
                 }
 
-                res.json({
-                    status: 'success',
-                    lessonName: name,
+                TeacherCourse.findOneAndUpdate({ _id: courseId }, {
+                    $set: { lessonVideo: name }
+                }, (err) => {
+                    if (err) {
+                        return res.status(404).json({
+                            status: "Course not found",
+                            message: err,
+                        });
+                    }
+                    console.log(name);
+                    res.json({
+                        status: 'success',
+                        lessonName: name,
+                    });
                 });
             });
         } catch (error) {
