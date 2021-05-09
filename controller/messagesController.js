@@ -1,36 +1,30 @@
+const DialogModel = require('../models/Dialogs');
 
-const DialogModel = require("../models/Dialogs");
-
-const MessageModel = require("../models/Messages");
+const MessageModel = require('../models/Messages');
 
 class MessageController {
     constructor(io) {
         this.io = io;
     }
 
-    updateReadStatus = (
-        res,
-        userId,
-        dialogId
-    ) => {
-        console.log(userId,
-            dialogId)
+    updateReadStatus = (res, userId, dialogId) => {
+        console.log(userId, dialogId);
         MessageModel.updateMany(
             { dialog: dialogId, user: { $ne: userId } },
-            { $set: { read: true }},
+            { $set: { read: true } },
             (err) => {
                 if (err) {
                     res.status(500).json({
-                        status: "error",
+                        status: 'error',
                         message: err,
                     });
                 } else {
-                    this.io.emit("SERVER:MESSAGES_READED", {
+                    this.io.emit('SERVER:MESSAGES_READED', {
                         userId,
                         dialogId,
                     });
                 }
-            }
+            },
         );
     };
 
@@ -41,17 +35,17 @@ class MessageController {
         this.updateReadStatus(res, userId, dialogId);
 
         MessageModel.find({ dialog: dialogId })
-            .populate(["dialog", "user"])
+            .populate(['dialog', 'user'])
             .exec((err, messages) => {
                 if (err) {
                     res.status(404).json({
-                        message: "Messages not found",
+                        message: 'Messages not found',
                     });
                 }
 
                 return res.json(messages);
             });
-    }
+    };
 
     create = (req, res) => {
         const userId = req.user.id;
@@ -67,33 +61,33 @@ class MessageController {
         message
             .save()
             .then((obj) => {
-                obj.populate(["dialog", "user"], (err, message) => {
+                obj.populate(['dialog', 'user'], (err, message) => {
                     if (err) {
                         res.status(500).json({
-                            message: err
+                            message: err,
                         });
                     }
                     DialogModel.findOneAndUpdate(
                         { _id: postData.dialog },
                         { lastMessage: message._id },
                         { upsert: true },
-                        function (err) {
+                        function(err) {
                             if (err) {
                                 return res.status(500).json({
-                                    status: "error",
-                                    message: err
+                                    status: 'error',
+                                    message: err,
                                 });
                             }
-                        }
+                        },
                     );
                     res.json(message);
-                    this.io.emit("SERVER:NEW_MESSAGE", message);
+                    this.io.emit('SERVER:NEW_MESSAGE', message);
                 });
             })
             .catch((reason) => {
                 res.json(reason);
             });
-    }
+    };
 
     delete = (req, res) => {
         const id = req.query.id;
@@ -102,8 +96,8 @@ class MessageController {
         MessageModel.findById(id, (err, message) => {
             if (err || !message) {
                 return res.status(404).json({
-                    status: "error",
-                    message: "Message not found",
+                    status: 'error',
+                    message: 'Message not found',
                 });
             }
 
@@ -111,11 +105,12 @@ class MessageController {
                 const dialogId = message.dialog;
                 message.remove();
 
-                MessageModel.findOne({ dialog: dialogId }).sort({ createdAt: -1 })
+                MessageModel.findOne({ dialog: dialogId })
+                    .sort({ createdAt: -1 })
                     .exec((err, lastMessage) => {
                         if (err) {
                             res.status(500).json({
-                                status: "error",
+                                status: 'error',
                                 message: err,
                             });
                         }
@@ -123,38 +118,38 @@ class MessageController {
                         DialogModel.findById(dialogId, (err, dialog) => {
                             if (err) {
                                 res.status(500).json({
-                                    status: "error",
+                                    status: 'error',
                                     message: err,
                                 });
                             }
 
                             if (!dialog) {
                                 return res.status(404).json({
-                                    status: "not found",
+                                    status: 'not found',
                                     message: err,
                                 });
                             }
-                            
+
                             if (lastMessage) {
                                 dialog.lastMessage = lastMessage._id.toString();
                             }
 
                             dialog.save();
-                            this.io.emit("SERVER:DIALOG_CREATED");
+                            this.io.emit('SERVER:DIALOG_CREATED');
                         });
                     });
                 return res.json({
-                    status: "success",
-                    message: "Message deleted",
+                    status: 'success',
+                    message: 'Message deleted',
                 });
             } else {
                 return res.status(403).json({
-                    status: "error",
-                    message: "Not have permission",
+                    status: 'error',
+                    message: 'Not have permission',
                 });
             }
         });
-    }
+    };
 }
 
 module.exports = MessageController;

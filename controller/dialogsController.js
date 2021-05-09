@@ -1,7 +1,6 @@
-
-const DialogModel = require("../models/Dialogs");
-const MessageModel = require("../models/Messages");
-const TeacherCourse = require("../models/TeacherCourse");
+const DialogModel = require('../models/Dialogs');
+const MessageModel = require('../models/Messages');
+const TeacherCourse = require('../models/TeacherCourse');
 // import socket from "socket.io";
 
 class DialogController {
@@ -22,9 +21,10 @@ class DialogController {
                 },
             })
             .exec((err, dialogs) => {
+                console.log(dialogs);
                 if (err) {
                     res.status(404).json({
-                        message: "Dialogs not found",
+                        message: 'Dialogs not found',
                     });
                 }
 
@@ -33,74 +33,71 @@ class DialogController {
     }
 
     create = (req, res) => {
-        const isOnePartnerOrGroup = "IS_ONE_PARTNER";
+        const isOnePartnerOrGroup = 'IS_ONE_PARTNER';
 
         const postData = {
             author: req.user.id,
             partner: req.body.partner,
-            isOnePartnerOrGroup
+            isOnePartnerOrGroup,
         };
 
         const dialog = new DialogModel(postData);
-        dialog
-            .save()
-            .then((dialogObj) => {
-                const message = new MessageModel({
-                    text: req.body.text,
-                    user: req.user.id,
-                    dialog: dialogObj._id
-                });
-
-                message
-                    .save()
-                    .then(() => {
-                        dialogObj.lastMessage = message._id;
-                        dialogObj.save().then(() => {
-                            res.json(dialogObj);
-                            this.io.emit("SERVER:DIALOG_CREATED", {
-                                ...postData,
-                                dialog: dialogObj
-                            });
-                        });
-                    })
-                    .catch(reason => {
-                        res.json(reason);
-                    });
+        dialog.save().then((dialogObj) => {
+            const message = new MessageModel({
+                text: req.body.text,
+                user: req.user.id,
+                dialog: dialogObj._id,
             });
-    }
+
+            message
+                .save()
+                .then(() => {
+                    dialogObj.lastMessage = message._id;
+                    dialogObj.save().then(() => {
+                        res.json(dialogObj);
+                        this.io.emit('SERVER:DIALOG_CREATED', {
+                            ...postData,
+                            dialog: dialogObj,
+                        });
+                    });
+                })
+                .catch((reason) => {
+                    res.json(reason);
+                });
+        });
+    };
 
     createGroup = (req, res) => {
         // const arr = ["6043b8c2ba55502c6739d8fb", "6040f4bc1f99a7b5992d882c", "602ad55a9725bfd6334b398a"]
 
-        const textForCreateGroup = "Группа курса созданна";
-        const isOnePartnerOrGroup = "IS_GROUP";
+        const textForCreateGroup = 'Группа курса созданна';
+        const isOnePartnerOrGroup = 'IS_GROUP';
 
-        TeacherCourse.findOne({ _id: req.body.courseId }).exec((err, course) => {
-            if (err) {
-                res.status(401).json({
-                    status: "Course not found",
-                    message: err
-                })
-            }
+        TeacherCourse.findOne({ _id: req.body.courseId }).exec(
+            (err, course) => {
+                if (err) {
+                    res.status(401).json({
+                        status: 'Course not found',
+                        message: err,
+                    });
+                }
 
-            if (req.body.groupName && course) {
-                const groupData = {
-                    author: req.user.id,
-                    partner: course.courseUsers,
-                    dialogName: req.body.groupName,
-                    isOnePartnerOrGroup,
-                    course: req.body.courseId,
-                };
+                if (req.body.groupName && course) {
+                    const groupData = {
+                        author: req.user.id,
+                        partner: course.courseUsers,
+                        dialogName: req.body.groupName,
+                        isOnePartnerOrGroup,
+                        course: req.body.courseId,
+                    };
 
-                const dialogGroup = new DialogModel(groupData);
+                    const dialogGroup = new DialogModel(groupData);
 
-                dialogGroup
-                    .save()
-                    .then((dialogObj) => {
+                    dialogGroup.save().then((dialogObj) => {
                         const message = new MessageModel({
                             text: textForCreateGroup,
                             user: req.user.id,
-                            dialog: dialogObj._id
+                            dialog: dialogObj._id,
                         });
 
                         message
@@ -109,22 +106,22 @@ class DialogController {
                                 dialogObj.lastMessage = message._id;
                                 dialogObj.save().then(() => {
                                     res.json(dialogObj);
-                                    this.io.emit("SERVER:DIALOG_CREATED", {
+                                    this.io.emit('SERVER:DIALOG_CREATED', {
                                         ...groupData,
-                                        dialog: dialogObj
+                                        dialog: dialogObj,
                                     });
                                 });
                             })
-                            .catch(reason => {
+                            .catch((reason) => {
                                 res.json(reason);
                             });
-                    })
-            } else {
-                res.json({ status: 'error' })
-            }
-        });
-
-    }
+                    });
+                } else {
+                    res.json({ status: 'error' });
+                }
+            },
+        );
+    };
 
     delete(req, res) {
         const id = req.params.id;
@@ -137,7 +134,7 @@ class DialogController {
                     });
                 } else {
                     res.status(404).json({
-                        status: "Dialog not found",
+                        status: 'Dialog not found',
                     });
                 }
             })

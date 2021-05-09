@@ -1,14 +1,13 @@
-const User = require("../models/User");
-const TeacherCourse = require("../models/TeacherCourse");
-const bcrypt = require("bcryptjs");
-const { validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const config = require("config");
+const User = require('../models/User');
+const TeacherCourse = require('../models/TeacherCourse');
+const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const mailer = require('../mailer/nodemailer');
-const Uuid = require("uuid");
-const path = require("path");
-const DialogModel = require("../models/Dialogs");
-
+const Uuid = require('uuid');
+const path = require('path');
+const DialogModel = require('../models/Dialogs');
 
 class UserController {
     async registration(req, res) {
@@ -18,7 +17,7 @@ class UserController {
             if (!errors.isEmpty()) {
                 return res
                     .status(400)
-                    .json({ message: "Uncorrect request", errors });
+                    .json({ message: 'Uncorrect request', errors });
             }
 
             const { email, password, name, surname, teacher } = req.body;
@@ -39,7 +38,7 @@ class UserController {
                 name: name,
                 surname: surname,
                 teacher: teacher,
-                competence: "",
+                competence: '',
                 shoppingCart: [],
                 purchasedCourses: [],
             });
@@ -55,13 +54,13 @@ class UserController {
                     //     html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:3000/verify?hash=${data.confirm_hash}">по этой ссылке</a>`,
                     // };
                     // return mailer(message);
-                }).catch((err) => {
+                })
+                .catch((err) => {
                     res.send({ message: err });
                 });
-
         } catch (e) {
             console.log(e);
-            res.send({ message: "Server error" });
+            res.send({ message: 'Server error' });
         }
     }
 
@@ -75,7 +74,7 @@ class UserController {
                 if (err || !user) {
                     res.status(404).json({
                         status: 'error',
-                        message: 'Hash not found'
+                        message: 'Hash not found',
                     });
                 }
                 if (user) {
@@ -84,14 +83,14 @@ class UserController {
                     user.save((err) => {
                         if (err) {
                             return res.status(404).json({
-                                status: "error",
+                                status: 'error',
                                 message: err,
                             });
                         }
 
                         res.json({
-                            status: "success",
-                            message: "Аккаунт успешно подтвержден!",
+                            status: 'success',
+                            message: 'Аккаунт успешно подтвержден!',
                         });
                     });
                 }
@@ -105,13 +104,13 @@ class UserController {
             const user = await User.findOne({ email });
 
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(404).json({ message: 'User not found' });
             }
 
             const isPassValid = bcrypt.compareSync(password, user.password);
 
-            const token = jwt.sign({ id: user.id }, config.get("secretKey"), {
-                expiresIn: "1h",
+            const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
+                expiresIn: '1h',
             });
 
             if (isPassValid) {
@@ -132,13 +131,13 @@ class UserController {
                 });
             } else {
                 return res.json({
-                    status: "error",
-                    message: "Incorrect password or email",
+                    status: 'error',
+                    message: 'Incorrect password or email',
                 });
             }
         } catch (e) {
             console.log(e);
-            res.send({ message: "Server error" });
+            res.send({ message: 'Server error' });
         }
     }
 
@@ -146,8 +145,8 @@ class UserController {
         try {
             const user = await User.findOne({ _id: req.user.id });
 
-            const token = jwt.sign({ id: user.id }, config.get("secretKey"), {
-                expiresIn: "100h",
+            const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
+                expiresIn: '100h',
             });
 
             return res.json({
@@ -166,7 +165,7 @@ class UserController {
             });
         } catch (e) {
             console.log(e);
-            res.send({ message: "Auth error" });
+            res.send({ message: 'Auth error' });
         }
     }
 
@@ -182,24 +181,24 @@ class UserController {
             user.save(async (err) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error update user info",
+                        status: 'Error update user info',
                         message: err,
                     });
                 }
 
                 await TeacherCourse.updateMany(
                     { user: req.user.id },
-                    { $set: { author: name + " " + surname } }
+                    { $set: { author: name + ' ' + surname } },
                 ).exec();
 
                 res.json({
-                    status: "success",
-                    message: "Update user info",
+                    status: 'success',
+                    message: 'Update user info',
                 });
             });
         } catch (e) {
             console.log(e);
-            res.send({ message: "User change info error" });
+            res.send({ message: 'User change info error' });
         }
     }
 
@@ -208,23 +207,23 @@ class UserController {
             const shoppingCart = req.query.shoppingCartId;
             const user = await User.findOne({ _id: req.user.id });
             user.shoppingCart = Array.from(
-                new Set(user.shoppingCart.concat(shoppingCart))
+                new Set(user.shoppingCart.concat(shoppingCart)),
             );
             user.save((err) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error add course for shopping cart",
+                        status: 'Error add course for shopping cart',
                         message: err,
                     });
                 }
 
                 res.json({
-                    status: "success",
-                    message: "Add course for shopping cart",
+                    status: 'success',
+                    message: 'Add course for shopping cart',
                 });
             });
         } catch (error) {
-            res.send({ message: "User shopping cart error" });
+            res.send({ message: 'User shopping cart error' });
         }
     }
 
@@ -235,49 +234,52 @@ class UserController {
             const user = await User.findOne({ _id: req.user.id }).exec();
 
             user.purchasedCourses = Array.from(
-                new Set(user.purchasedCourses.concat(purchasedCoursesId))
+                new Set(user.purchasedCourses.concat(purchasedCoursesId)),
             );
 
             user.save((err, userData) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error add Purchased courses",
+                        status: 'Error add Purchased courses',
                         message: err,
                     });
                 }
 
                 res.json({
-                    status: "success",
-                    message: "Purchased courses added",
+                    status: 'success',
+                    message: 'Purchased courses added',
                 });
             });
 
-            TeacherCourse.findOne({ _id: purchasedCoursesId }).exec((err, course) => {
-                if (err) {
-                    res.status(401).json({
-                        status: "Course not found",
-                        message: err
-                    })
-                }
-              
-                if (course.user != req.user.id) {
-
-                    course.courseUsers = Array.from(
-                        new Set(course.courseUsers.concat(req.user.id))
-                    );
-                }
-
-                DialogModel.findOne({ course: purchasedCoursesId}).exec((err, dialogData) => {
-                    if(dialogData) {
-                        dialogData.partner = course.courseUsers;
-                        dialogData.save();
+            TeacherCourse.findOne({ _id: purchasedCoursesId }).exec(
+                (err, course) => {
+                    if (err) {
+                        res.status(401).json({
+                            status: 'Course not found',
+                            message: err,
+                        });
                     }
-                });
 
-                course.save();
-            });
+                    if (course.user != req.user.id) {
+                        course.courseUsers = Array.from(
+                            new Set(course.courseUsers.concat(req.user.id)),
+                        );
+                    }
+
+                    DialogModel.findOne({ course: purchasedCoursesId }).exec(
+                        (err, dialogData) => {
+                            if (dialogData) {
+                                dialogData.partner = course.courseUsers;
+                                dialogData.save();
+                            }
+                        },
+                    );
+
+                    course.save();
+                },
+            );
         } catch (error) {
-            res.send({ message: "User add purchased courses error" });
+            res.send({ message: 'User add purchased courses error' });
         }
     }
 
@@ -285,22 +287,22 @@ class UserController {
         try {
             const file = req.files.file;
 
-            const avatarName = Uuid.v4() + ".jpg";
+            const avatarName = Uuid.v4() + '.jpg';
 
             const Path = path.join(__dirname, `../static/avatars`);
 
-            file.mv(Path + "/" + avatarName);
+            file.mv(Path + '/' + avatarName);
 
             const user = await User.findById(req.user.id);
-            const token = jwt.sign({ id: user.id }, config.get("secretKey"), {
-                expiresIn: "100h",
+            const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
+                expiresIn: '100h',
             });
 
             user.avatar = avatarName;
             user.save((err) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error upload avatar",
+                        status: 'Error upload avatar',
                         message: err,
                     });
                 }
@@ -317,7 +319,7 @@ class UserController {
             });
         } catch (e) {
             console.log(e);
-            return res.status(500).json({ message: "Upload avatar error" });
+            return res.status(500).json({ message: 'Upload avatar error' });
         }
     }
     findUsers = (req, res) => {
@@ -325,18 +327,17 @@ class UserController {
 
         User.find()
             .or([
-                { fullname: new RegExp(query, "i") },
-                { email: new RegExp(query, "i") }
+                { fullname: new RegExp(query, 'i') },
+                { email: new RegExp(query, 'i') },
             ])
             .then((users) => res.json(users))
             .catch((err) => {
                 return res.status(404).json({
-                    status: "error",
-                    message: err
+                    status: 'error',
+                    message: err,
                 });
             });
     };
 }
 
 module.exports = new UserController();
-

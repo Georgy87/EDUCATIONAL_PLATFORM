@@ -1,19 +1,18 @@
-
-const Comments = require("../models/Comments");
-const Uuid = require("uuid");
-const path = require("path");
-const fs = require("fs");
+const Comments = require('../models/Comments');
+const Uuid = require('uuid');
+const path = require('path');
+const fs = require('fs');
 
 class commentsController {
     async createComment(req, res) {
         try {
             let file;
-            const photoName = Uuid.v4() + ".jpg";
+            const photoName = Uuid.v4() + '.jpg';
 
             if (req.files) {
                 file = req.files.file;
                 const Path = path.join(__dirname, `../static/commentPhotos`);
-                file.mv(Path + "/" + photoName);
+                file.mv(Path + '/' + photoName);
             }
 
             const { courseId, text } = req.body;
@@ -39,24 +38,24 @@ class commentsController {
                 if (err) {
                     return res.status(400).json({
                         status: 'Create comment error',
-                        message: err
+                        message: err,
                     });
                 }
 
                 Comments.find({ courseId: courseId })
-                    .populate("user")
-                    .populate("comments.user")
-                    .sort({ 'created': -1 })
+                    .populate('user')
+                    .populate('comments.user')
+                    .sort({ created: -1 })
                     .exec((err, comments) => {
                         if (err) {
                             return res.status(404).json({
                                 status: 'Comments not found',
-                                message: err
+                                message: err,
                             });
                         }
                         return res.json({
-                            status: "success",
-                            data: comments
+                            status: 'success',
+                            data: comments,
                         });
                     });
             });
@@ -73,14 +72,14 @@ class commentsController {
                 if (err) {
                     return res.status(404).json({
                         status: 'Comments not found',
-                        message: err
+                        message: err,
                     });
                 }
 
                 if (req.query.photoName != 'undefined') {
                     const Path = path.join(
                         __dirname,
-                        `../static/commentPhotos/${req.query.photoName}`
+                        `../static/commentPhotos/${req.query.photoName}`,
                     );
                     if (Path) {
                         fs.unlinkSync(Path);
@@ -90,8 +89,9 @@ class commentsController {
                 if (data) {
                     data.deleteOne(() => {
                         Comments.find({ courseId })
-                            .populate("user")
-                            .populate("comments.user").exec((err, data) => {
+                            .populate('user')
+                            .populate('comments.user')
+                            .exec((err, data) => {
                                 return res.json({
                                     data: data,
                                 });
@@ -108,39 +108,43 @@ class commentsController {
         try {
             const { commentId, replyId } = req.query;
 
-            Comments.findOneAndUpdate({ _id: replyId }, {
-                $pull: {
-                    comments: { _id: commentId },
-                }
-            }, function (err, data) {
-                if (err) {
-                    return res.status(404).json({
-                        status: 'Reply to comments not found',
-                        message: err
-                    });
-                }
-
-                if (req.query.photoName != 'undefined') {
-                    const Path = path.join(
-                        __dirname,
-                        `../static/replyToCommentPhoto/${req.query.photoName}`
-                    );
-                    if (Path) {
-                        fs.unlinkSync(Path);
-                    }
-                }
-
-                Comments.findOne({ _id: replyId })
-                    .populate("user")
-                    .populate("comments.user")
-                    .exec(function (err, comment) {
-                        console.log(comment);
-
-                        return res.json({
-                            data: comment,
+            Comments.findOneAndUpdate(
+                { _id: replyId },
+                {
+                    $pull: {
+                        comments: { _id: commentId },
+                    },
+                },
+                function(err, data) {
+                    if (err) {
+                        return res.status(404).json({
+                            status: 'Reply to comments not found',
+                            message: err,
                         });
-                    });
-            });
+                    }
+
+                    // if (req.query.photoName != 'undefined') {
+                    //     const Path = path.join(
+                    //         __dirname,
+                    //         `../static/replyToCommentPhoto/${req.query.photoName}`,
+                    //     );
+                    //     if (Path) {
+                    //         fs.unlinkSync(Path);
+                    //     }
+                    // }
+
+                    Comments.findOne({ _id: replyId })
+                        .populate('user')
+                        .populate('comments.user')
+                        .exec(function(err, comment) {
+                            console.log(comment);
+
+                            return res.json({
+                                data: comment,
+                            });
+                        });
+                },
+            );
         } catch (e) {
             console.log(e);
         }
@@ -152,44 +156,50 @@ class commentsController {
             const userId = req.user.id;
 
             let file;
-            const photoName = Uuid.v4() + ".jpg";
+            const photoName = Uuid.v4() + '.jpg';
 
             if (req.files) {
                 file = req.files.file;
-                const Path = path.join(__dirname, `../static/replyToCommentPhoto`);
-                file.mv(Path + "/" + photoName);
+                const Path = path.join(
+                    __dirname,
+                    `../static/replyToCommentPhoto`,
+                );
+                file.mv(Path + '/' + photoName);
             }
-            // console.log( text, commentId, file);
 
-            if (req.files) {
-                Comments.findOneAndUpdate({ _id: commentId }, {
+            let photo = '';
+
+            req.files ? (photo = photoName) : (photo = '');
+
+            Comments.findOneAndUpdate(
+                { _id: commentId },
+                {
                     $push: {
                         comments: {
                             text: text,
                             user: userId,
-                            photo: photoName,
-                        }
-                    }
-                }, function (err, comment) {
+                            photo,
+                        },
+                    },
+                },
+                function(err, comment) {
                     if (err) {
                         return res.status(400).json({
                             status: 'Create comment error',
-                            message: err
+                            message: err,
                         });
                     }
 
                     Comments.findOne({ _id: commentId })
-                        .populate("user")
-                        .populate("comments.user")
-                        .exec(function (err, comment) {
-
+                        .populate('user')
+                        .populate('comments.user')
+                        .exec(function(err, comment) {
                             return res.json({
                                 data: comment,
                             });
                         });
-                });
-            }
-
+                },
+            );
         } catch (e) {
             console.log(e);
         }
@@ -199,10 +209,10 @@ class commentsController {
         try {
             const { courseId } = req.query;
             Comments.find({ courseId })
-                .populate("user")
-                .populate("comments.user")
-                .sort({ 'created': -1 })
-                .exec(function (err, data) {
+                .populate('user')
+                .populate('comments.user')
+                .sort({ created: -1 })
+                .exec(function(err, data) {
                     if (data) {
                         return res.json({
                             data: data,
@@ -219,13 +229,13 @@ class commentsController {
             const { commentId } = req.query;
 
             Comments.findOne({ _id: commentId })
-                .populate("user")
-                .populate("comments.user")
-                .exec(function (err, comment) {
+                .populate('user')
+                .populate('comments.user')
+                .exec(function(err, comment) {
                     if (err) {
                         res.status(404).json({
                             status: 'Comments not found',
-                            message: err
+                            message: err,
                         });
                     }
                     return res.json({
@@ -239,4 +249,3 @@ class commentsController {
 }
 
 module.exports = new commentsController();
-

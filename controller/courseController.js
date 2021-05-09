@@ -1,14 +1,14 @@
 // const Course = require("../models/Course");
-const User = require("../models/User");
-const Uuid = require("uuid");
-const path = require("path");
-const fs = require("fs");
+const User = require('../models/User');
+const Uuid = require('uuid');
+const path = require('path');
+const fs = require('fs');
 
-const jwt = require("jsonwebtoken");
-const config = require("config");
-const TeacherCourse = require("../models/TeacherCourse");
-const Modules = require("../models/Modules");
-const Comments = require("../models/Comments");
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const TeacherCourse = require('../models/TeacherCourse');
+const Modules = require('../models/Modules');
+const Comments = require('../models/Comments');
 class courseController {
     async uploadNewCourse(req, res) {
         try {
@@ -22,7 +22,7 @@ class courseController {
             // videoMv.mv(pathVideos + "/" + videoMv.name);
 
             const pathPhotos = path.join(__dirname, `../static/coursePhotos`);
-            photoMv.mv(pathPhotos + "/" + photoMv.name);
+            photoMv.mv(pathPhotos + '/' + photoMv.name);
 
             const {
                 profession,
@@ -36,11 +36,11 @@ class courseController {
 
             const dbFile = new TeacherCourse({
                 user: req.user.id,
-                professionalСompetence: "",
-                avatar: "",
+                professionalСompetence: '',
+                avatar: '',
                 photo,
                 profession,
-                competence: "",
+                competence: '',
                 author,
                 price,
                 smallDescription,
@@ -51,20 +51,20 @@ class courseController {
             dbFile.save((err) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error upload course",
+                        status: 'Error upload course',
                         message: err,
                     });
                 }
 
                 res.json({
-                    status: "success",
-                    message: "Course upload done",
+                    status: 'success',
+                    message: 'Course upload done',
                 });
-            })
+            });
         } catch (e) {
             return res
                 .status(500)
-                .json({ message: "Upload teacher course error" });
+                .json({ message: 'Upload teacher course error' });
         }
     }
 
@@ -73,13 +73,13 @@ class courseController {
             TeacherCourse.find().exec((err, courses) => {
                 if (err) {
                     return res.status(404).json({
-                        status: "Error get course",
+                        status: 'Error get course',
                         message: err,
                     });
                 }
 
                 return res.json({
-                    status: "success",
+                    status: 'success',
                     courses,
                 });
             });
@@ -93,14 +93,14 @@ class courseController {
             TeacherCourse.findOne({ _id: req.query.id }).exec((err, course) => {
                 if (err) {
                     return res.status(400).json({
-                        status: "Error course delete",
+                        status: 'Error course delete',
                         message: err,
                     });
                 }
 
                 const Path = path.join(
                     __dirname,
-                    `../static/coursePhotos/${req.query.name}`
+                    `../static/coursePhotos/${req.query.name}`,
                 );
 
                 fs.unlinkSync(Path);
@@ -108,28 +108,31 @@ class courseController {
                 course.remove();
 
                 return res.json({
-                    status: "success",
-                    message: "Course was deleted"
+                    status: 'success',
+                    message: 'Course was deleted',
                 });
             });
         } catch (e) {
             console.log(e);
-            return res.status(500).json({ message: "Delete course error" });
+            return res.status(500).json({ message: 'Delete course error' });
         }
     }
 
     async getProfileCourse(req, res) {
         try {
             const id = req.query.id;
-            TeacherCourse.find({ _id: id }).populate('user').populate('content').exec((err, course) => {
-                if (err) {
-                    return res.status(404).json({
-                        status: "Course profile not found",
-                        message: err,
-                    });
-                }
-                return res.json(course[0]);
-            });
+            TeacherCourse.find({ _id: id })
+                .populate('user')
+                .populate('content')
+                .exec((err, course) => {
+                    if (err) {
+                        return res.status(404).json({
+                            status: 'Course profile not found',
+                            message: err,
+                        });
+                    }
+                    return res.json(course[0]);
+                });
         } catch (e) {
             console.log(e);
         }
@@ -142,7 +145,7 @@ class courseController {
                 if (err) {
                     return res.status(400).json({
                         status: 'Get teacher profile error',
-                        message: err
+                        message: err,
                     });
                 }
 
@@ -163,7 +166,7 @@ class courseController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Get teacher profile error" });
+                .json({ message: 'Get teacher profile error' });
         }
     }
 
@@ -178,13 +181,13 @@ class courseController {
                 _id: { $in: ids },
             })
                 .select(
-                    "-content -comments -user -smallDescription -fullDescription -updatedAt -__v -competence"
+                    '-content -comments -user -smallDescription -fullDescription -updatedAt -__v -competence',
                 )
-                .exec(function (err, coursesDestructured) {
+                .exec(function(err, coursesDestructured) {
                     if (err) {
                         return res.status(400).json({
                             status: 'Get courses for shopping cart error',
-                            message: err
+                            message: err,
                         });
                     }
                     coursesDestructured.map((element) => {
@@ -200,7 +203,7 @@ class courseController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Get Course for shopping cart error" });
+                .json({ message: 'Get Course for shopping cart error' });
         }
     }
 
@@ -229,14 +232,14 @@ class courseController {
                             smallDescription: element.smallDescription,
                             profession: element.profession,
                             _id: element._id,
-                        }
+                        },
                     );
                 });
 
                 user.save((err) => {
                     if (err) {
                         return res.status(404).json({
-                            status: "error",
+                            status: 'error',
                             message: err,
                         });
                     }
@@ -251,7 +254,7 @@ class courseController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Delete Course for shopping cart error" });
+                .json({ message: 'Delete Course for shopping cart error' });
         }
     }
 
@@ -259,41 +262,47 @@ class courseController {
         try {
             User.findOne({ _id: req.user.id }).exec(async (err, user) => {
                 const ids = user.purchasedCourses;
-                TeacherCourse.find({ _id: { $in: ids } }).select("-content -profession -competence -user -price -__v -comments -createdAt -updatedAt -avatar -fullDescription").exec((err, courses) => {
-                    if (err) {
-                        return res.status(400).json({
-                            status: 'Get purchased purses error',
-                            message: err
-                        });
-                    }
-                    return res.json([...courses]);
-                });
+                TeacherCourse.find({ _id: { $in: ids } })
+                    .select(
+                        '-content -profession -competence -user -price -__v -comments -createdAt -updatedAt -avatar -fullDescription',
+                    )
+                    .exec((err, courses) => {
+                        if (err) {
+                            return res.status(400).json({
+                                status: 'Get purchased purses error',
+                                message: err,
+                            });
+                        }
+                        return res.json([...courses]);
+                    });
             });
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Get Course for Purchased Courses error" });
+                .json({ message: 'Get Course for Purchased Courses error' });
         }
     }
 
     async getCourseForTraining(req, res) {
         try {
             const id = req.query.id;
-            TeacherCourse.find({ _id: id }).populate('user').populate('content').exec((err, course) => {
-                if (err) {
-                    return res.status(404).json({
-                        status: "Get course for training error",
-                        message: err,
-                    });
-                }
+            TeacherCourse.find({ _id: id })
+                .populate('user')
+                .populate('content')
+                .exec((err, course) => {
+                    if (err) {
+                        return res.status(404).json({
+                            status: 'Get course for training error',
+                            message: err,
+                        });
+                    }
 
-                return res.json(course[0]);
-            });
-
+                    return res.json(course[0]);
+                });
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Get Course for Training error" });
+                .json({ message: 'Get Course for Training error' });
         }
     }
 
@@ -307,32 +316,38 @@ class courseController {
 
             // checkLesson.save();
 
-            Modules.findOneAndUpdate({ 'moduleContent._id': lessonId }, {
-                $set: { 'moduleContent.$.checkedLesson': lessonEnd }
-            }, (err, module) => {
-                if (err) {
-                    return res.status(404).json({
-                        status: "Checked lesson error",
-                        message: err,
-                    });
-                }
-                module.save(() => {
-                    TeacherCourse.find({ _id: module.course }).populate('user').populate('content').exec((err, course) => {
-                        if (err) {
-                            return res.status(404).json({
-                                status: "Get course for training error",
-                                message: err,
+            Modules.findOneAndUpdate(
+                { 'moduleContent._id': lessonId },
+                {
+                    $set: { 'moduleContent.$.checkedLesson': lessonEnd },
+                },
+                (err, module) => {
+                    if (err) {
+                        return res.status(404).json({
+                            status: 'Checked lesson error',
+                            message: err,
+                        });
+                    }
+                    module.save(() => {
+                        TeacherCourse.find({ _id: module.course })
+                            .populate('user')
+                            .populate('content')
+                            .exec((err, course) => {
+                                if (err) {
+                                    return res.status(404).json({
+                                        status: 'Get course for training error',
+                                        message: err,
+                                    });
+                                }
+                                return res.json(course[0]);
                             });
-                        }
-                        return res.json(course[0]);
                     });
-                });
-            });
-
+                },
+            );
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Get Course for Training error" });
+                .json({ message: 'Get Course for Training error' });
         }
     }
 
@@ -340,38 +355,42 @@ class courseController {
         try {
             const { courseId, questionText, answerOptions } = req.body;
 
-            TeacherCourse.findOneAndUpdate({ _id: courseId }, {
-                $push: {
-                    courseTest: {
-                        questionText: questionText,
-                        answerOptions: [...answerOptions],
+            TeacherCourse.findOneAndUpdate(
+                { _id: courseId },
+                {
+                    $push: {
+                        courseTest: {
+                            questionText: questionText,
+                            answerOptions: [...answerOptions],
+                        },
+                    },
+                },
+                (err, course) => {
+                    if (err) {
+                        return res.status(403).json({
+                            status: 'Create test for course error',
+                            message: 'error',
+                        });
                     }
-                }
-            }, (err, course) => {
-                if (err) {
-                    return res.status(403).json({
-                        status: 'Create test for course error',
-                        message: 'error',
-                    });
-                }
-                course.save();
-            });
+                    course.save();
+                },
+            );
         } catch (error) {
-            return res
-                .status(500)
-                .json({ message: 'Tests for course error' });
+            return res.status(500).json({ message: 'Tests for course error' });
         }
     }
 
     async getTestForCourse(req, res) {
         try {
-            TeacherCourse.findOne({ _id: req.query.courseId }).exec((err, course) => {
-                const questions = course.courseTest;
-                res.json({
-                    status: 'success',
-                    questions
-                });
-            });
+            TeacherCourse.findOne({ _id: req.query.courseId }).exec(
+                (err, course) => {
+                    const questions = course.courseTest;
+                    res.json({
+                        status: 'success',
+                        questions,
+                    });
+                },
+            );
         } catch (error) {
             return res
                 .status(500)
@@ -383,21 +402,22 @@ class courseController {
         try {
             const { videoNames } = req.body;
 
-            TeacherCourse.findOneAndUpdate({ _id: req.query.courseId }, {
-                $set: { courseLessonsVideo: videoNames }
-            }, (err, course) => {
-
-                if (err) {
-                    return res.status(404).json({
-                        status: "Course not found",
-                        message: err,
-                    });
-                }
-            })
+            TeacherCourse.findOneAndUpdate(
+                { _id: req.query.courseId },
+                {
+                    $set: { courseLessonsVideo: videoNames },
+                },
+                (err, course) => {
+                    if (err) {
+                        return res.status(404).json({
+                            status: 'Course not found',
+                            message: err,
+                        });
+                    }
+                },
+            );
         } catch (error) {
-            return res
-                .status(500)
-                .json({ message: 'Set video list error' });
+            return res.status(500).json({ message: 'Set video list error' });
         }
     }
 
@@ -412,35 +432,35 @@ class courseController {
 
                 if (err) {
                     return res.status(404).json({
-                        status: "Course not found",
+                        status: 'Course not found',
                         message: err,
                     });
                 }
 
-                TeacherCourse.findOneAndUpdate({ _id: courseId }, {
-                    $set: { lessonVideo: name }
-                }, (err) => {
-                    if (err) {
-                        return res.status(404).json({
-                            status: "Course not found",
-                            message: err,
+                TeacherCourse.findOneAndUpdate(
+                    { _id: courseId },
+                    {
+                        $set: { lessonVideo: name },
+                    },
+                    (err) => {
+                        if (err) {
+                            return res.status(404).json({
+                                status: 'Course not found',
+                                message: err,
+                            });
+                        }
+                        console.log(name);
+                        res.json({
+                            status: 'success',
+                            lessonName: name,
                         });
-                    }
-                    console.log(name);
-                    res.json({
-                        status: 'success',
-                        lessonName: name,
-                    });
-                });
+                    },
+                );
             });
         } catch (error) {
-            return res
-                .status(500)
-                .json({ message: 'Set video list error' });
+            return res.status(500).json({ message: 'Set video list error' });
         }
     }
 }
 
 module.exports = new courseController();
-
-
