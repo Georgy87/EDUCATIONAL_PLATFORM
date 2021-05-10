@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
 const CommentModel = new Schema({
     courseId: { type: String },
@@ -6,12 +6,12 @@ const CommentModel = new Schema({
     photo: { type: String },
     user: {
         required: true,
-        ref: "User",
+        ref: 'User',
         type: Schema.Types.ObjectId,
     },
     created: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
     comments: [
         {
@@ -19,16 +19,16 @@ const CommentModel = new Schema({
             photo: { type: String },
             user: {
                 required: true,
-                ref: "User",
+                ref: 'User',
                 type: Schema.Types.ObjectId,
-                trim: true
+                trim: true,
             },
             created: {
                 type: Date,
-                default: Date.now
+                default: Date.now,
             },
         },
     ],
 });
 
-module.exports = model("Comments", CommentModel);
+module.exports = model('Comments', CommentModel);

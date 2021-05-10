@@ -414,6 +414,10 @@ class courseController {
                             message: err,
                         });
                     }
+                    res.json({
+                        status: 'success',
+                        lessonsList: course.courseLessonsVideo,
+                    });
                 },
             );
         } catch (error) {
@@ -442,14 +446,14 @@ class courseController {
                     {
                         $set: { lessonVideo: name },
                     },
-                    (err) => {
+                    (err, course) => {
                         if (err) {
                             return res.status(404).json({
                                 status: 'Course not found',
                                 message: err,
                             });
                         }
-                        console.log(name);
+
                         res.json({
                             status: 'success',
                             lessonName: name,

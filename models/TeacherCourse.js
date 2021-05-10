@@ -1,7 +1,7 @@
-const { Schema, model, ObjectId } = require("mongoose");
+const { Schema, model, ObjectId } = require('mongoose');
 const TeacherCourse = new Schema(
     {
-        user: { type: ObjectId, ref: "User" },
+        user: { type: ObjectId, ref: 'User' },
         photo: { type: String },
         profession: { type: String },
         competence: { type: String },
@@ -9,9 +9,11 @@ const TeacherCourse = new Schema(
         price: { type: String },
         smallDescription: { type: String },
         fullDescription: { type: String },
-        user: { type: ObjectId, ref: "User" },
+        user: { type: ObjectId, ref: 'User' },
         avatar: { type: String },
-        content: [{ type: Schema.Types.ObjectId, ref: "Modules", require: true }],
+        content: [
+            { type: Schema.Types.ObjectId, ref: 'Modules', require: true },
+        ],
         courseUsers: { type: Array },
         courseLessonsVideo: { type: Array },
         lessonVideo: { type: String, require: true },
@@ -21,7 +23,7 @@ const TeacherCourse = new Schema(
                 answerOptions: [
                     {
                         answerText: String,
-                        isCorrect: Boolean
+                        isCorrect: Boolean,
                     },
                 ],
             },
@@ -29,6 +31,6 @@ const TeacherCourse = new Schema(
     },
     {
         timestamps: true,
-    }
+    },
 );
-module.exports = model("TeacherCourse", TeacherCourse);
+module.exports = model('TeacherCourse', TeacherCourse);

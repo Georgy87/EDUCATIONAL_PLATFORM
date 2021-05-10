@@ -1,22 +1,38 @@
-const Router = require("express");
+const Router = require('express');
 const router = new Router();
-const authMiddleWare = require("../middleware/auth.middleware");
-const courseController = require("../controller/courseController");
+const authMiddleWare = require('../middleware/auth.middleware');
+const courseController = require('../controller/courseController');
 
 // router.post("/upload", authMiddleWare, courseController.uploadCourse);
-router.get("", courseController.getCourses);
-router.delete("/", authMiddleWare, courseController.deleteCourse);
-router.get("/profile", courseController.getProfileCourse);
-router.post("/course", authMiddleWare, courseController.uploadNewCourse);
-router.get("/teacher-profile", courseController.getTeacherProfile);
-router.get("/shopping-cart", authMiddleWare, courseController.getCoursesForShoppingCart);
-router.delete("/delete-shopping-cart", authMiddleWare, courseController.deleteCoursesForShoppingCart);
-router.get("/purchased-courses", authMiddleWare, courseController.getPurchasedCourses);
-router.get("/training-course", authMiddleWare, courseController.getCourseForTraining);
-router.post("/checked-lesson", authMiddleWare, courseController.checkedLesson);
-router.post("/test", authMiddleWare, courseController.createTestForCourse);
-router.get("/test", authMiddleWare, courseController.getTestForCourse);
-router.post("/set-videos", authMiddleWare, courseController.setVideoList);
-router.post("/lessson-name", courseController.getLessonName);
+router.get('', courseController.getCourses);
+router.delete('/', authMiddleWare, courseController.deleteCourse);
+router.get('/profile', courseController.getProfileCourse);
+router.post('/course', authMiddleWare, courseController.uploadNewCourse);
+router.get('/teacher-profile', courseController.getTeacherProfile);
+router.get(
+    '/shopping-cart',
+    authMiddleWare,
+    courseController.getCoursesForShoppingCart,
+);
+router.delete(
+    '/delete-shopping-cart',
+    authMiddleWare,
+    courseController.deleteCoursesForShoppingCart,
+);
+router.get(
+    '/purchased-courses',
+    authMiddleWare,
+    courseController.getPurchasedCourses,
+);
+router.get(
+    '/training-course',
+    authMiddleWare,
+    courseController.getCourseForTraining,
+);
+router.post('/checked-lesson', authMiddleWare, courseController.checkedLesson);
+router.post('/test', authMiddleWare, courseController.createTestForCourse);
+router.get('/test', authMiddleWare, courseController.getTestForCourse);
+router.post('/set-videos', authMiddleWare, courseController.setVideoList);
+router.post('/lessson-name', courseController.getLessonName);
 
 module.exports = router;

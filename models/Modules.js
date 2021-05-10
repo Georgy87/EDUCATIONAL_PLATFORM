@@ -1,8 +1,12 @@
-const { Schema, model, ObjectId } = require("mongoose");
+const { Schema, model, ObjectId } = require('mongoose');
 
 const Lesson = new Schema({
-    course: { type: Schema.Types.ObjectId, ref: "TeacherCourse", require: true },
-    user: { type: Schema.Types.ObjectId, ref: "User", require: true },
+    course: {
+        type: Schema.Types.ObjectId,
+        ref: 'TeacherCourse',
+        require: true,
+    },
+    user: { type: Schema.Types.ObjectId, ref: 'User', require: true },
     module: { type: String },
     moduleHours: { type: Number },
     moduleMinutes: { type: Number },
@@ -19,8 +23,8 @@ const Lesson = new Schema({
                 },
             ],
             checkedLesson: { type: Boolean },
-        }
+        },
     ],
 });
 
-module.exports = model("Modules", Lesson);
+module.exports = model('Modules', Lesson);
