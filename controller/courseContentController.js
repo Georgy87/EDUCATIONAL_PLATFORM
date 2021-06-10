@@ -282,7 +282,7 @@ class courseContentController {
 
             const courseId = req.query.courseId;
 
-            const module = await Modules.findOneAndUpdate(
+            Modules.findOneAndUpdate(
                 { _id: moduleId },
                 {
                     $set: {

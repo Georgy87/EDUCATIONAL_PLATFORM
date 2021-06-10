@@ -5,10 +5,10 @@ const courseContentRouter = require("../routes/courseContent.routes");
 const userRouter = require("../routes/user.routes");
 const commentRouter = require("../routes/comment.routes");
 const fileUpload = require("express-fileupload");
-const corsmiddleware = require("../middleware/cors.middleware");
 const DialogController = require('../controller/dialogsController');
 const MessagesController = require('../controller/messagesController');
 const lastSeenMiddleware = require("../middleware/updateLastSeen.middleware");
+const cors = require("cors");
 
 const authMiddleWare = require("../middleware/auth.middleware");
 
@@ -17,14 +17,23 @@ module.exports.createUseApp = (app, io) => {
     const MessageCtrl = new MessagesController(io);
 
     app.use(fileUpload({}));
-    app.use(corsmiddleware);
     app.use(express.json());
+    app.use(cors());
+    app.use(function (err, req, res, next) {
+        if (err) {
+            return console.log('Иди нахуй');
+        }
+       
+        return res.status(500).send('Something broke!');
+    });
+  
 
     app.use("/api/auth", userRouter);
     app.use("/api/course", [courseRouter, commentRouter]);
     app.use("/api/direction", directionRouter);
     app.use("/api/teacher", courseRouter);
     app.use("/api/teacher", courseContentRouter);
+
 
     // Доработать
 
@@ -46,4 +55,5 @@ module.exports.createUseApp = (app, io) => {
     app.use(express.static("static/directions"));
     app.use(express.static("static/avatars"));
     app.use(express.static("static/videos"));
+
 }

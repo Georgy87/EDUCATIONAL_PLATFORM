@@ -6,8 +6,6 @@ const PORT = config.get("serverPort");
 const { createUseApp } = require("./core/moduleApp");
 const { createServer } = require("http");
 const { createSocket } = require('./core/socket');
-const { Server, Socket } = require("socket.io");
-const socket = require("socket.io");
 
 const http = createServer(app);
 
@@ -25,7 +23,9 @@ const start = async () => {
             console.log("Server started on port", PORT);
         });
 
+
         createUseApp(app, io);
+      
 
     } catch (e) {
         console.log(e);

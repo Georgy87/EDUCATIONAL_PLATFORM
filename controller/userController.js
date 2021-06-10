@@ -4,97 +4,29 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const mailer = require('../mailer/nodemailer');
 const Uuid = require('uuid');
 const path = require('path');
 const DialogModel = require('../models/Dialogs');
+const UserService = require('../services/userService');
 
 class UserController {
+    constructor() {
+        this.userService = UserService;
+    }
+
     async registration(req, res) {
         try {
-            const errors = validationResult(req);
-
-            if (!errors.isEmpty()) {
-                return res
-                    .status(400)
-                    .json({ message: 'Uncorrect request', errors });
-            }
-
-            const { email, password, name, surname, teacher } = req.body;
-
-            const candidate = await User.findOne({ email, name });
-
-            if (candidate) {
-                return res
-                    .status(400)
-                    .json({ message: `User with email ${email} alredy exist` });
-            }
-
-            const hashPassword = await bcrypt.hash(password, 8);
-
-            const user = new User({
-                email: email,
-                password: hashPassword,
-                name: name,
-                surname: surname,
-                teacher: teacher,
-                competence: '',
-                shoppingCart: [],
-                purchasedCourses: [],
-            });
-
-            user.confirm_hash = await bcrypt.hash(new Date().toString(), 8);
-
-            user.save()
-                .then((data) => {
-                    // const message = {
-                    //     from: "admin@test.com",
-                    //     to: email,
-                    //     subject: "Подтверждение почты от Platform",
-                    //     html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:3000/verify?hash=${data.confirm_hash}">по этой ссылке</a>`,
-                    // };
-                    // return mailer(message);
-                })
-                .catch((err) => {
-                    res.send({ message: err });
-                });
+            this.userService.registration(req, res);
         } catch (e) {
             console.log(e);
-            res.send({ message: 'Server error' });
         }
     }
 
     async verify(req, res) {
-        const hash = req.query.hash;
-
-        if (!hash) {
-            res.status(422).json({ errors: 'Invalid hash!' });
-        } else {
-            await User.findOne({ confirm_hash: hash }, (err, user) => {
-                if (err || !user) {
-                    res.status(404).json({
-                        status: 'error',
-                        message: 'Hash not found',
-                    });
-                }
-                if (user) {
-                    user.confirmed = true;
-
-                    user.save((err) => {
-                        if (err) {
-                            return res.status(404).json({
-                                status: 'error',
-                                message: err,
-                            });
-                        }
-
-                        res.json({
-                            status: 'success',
-                            message: 'Аккаунт успешно подтвержден!',
-                        });
-                    });
-                }
-            }).exec();
+        try {
+            this.userService.verify(req, res);
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -102,6 +34,7 @@ class UserController {
         try {
             const { email, password } = req.body;
             const user = await User.findOne({ email });
+
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
@@ -142,31 +75,8 @@ class UserController {
     }
 
     async auth(req, res) {
-        try {
-            const user = await User.findOne({ _id: req.user.id });
-
-            const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
-                expiresIn: '100h',
-            });
-
-            return res.json({
-                token,
-                user: {
-                    _id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    surname: user.surname,
-                    avatar: user.avatar,
-                    teacher: user.teacher,
-                    competence: user.competence,
-                    shoppingCart: user.shoppingCart,
-                    purchasedCourses: user.purchasedCourses,
-                },
-            });
-        } catch (e) {
-            console.log(e);
-            res.send({ message: 'Auth error' });
-        }
+        const { token, user } = await this.userService.auth(req, res);
+        return res.json({ token, user });
     }
 
     async update(req, res) {
@@ -322,6 +232,7 @@ class UserController {
             return res.status(500).json({ message: 'Upload avatar error' });
         }
     }
+
     findUsers = (req, res) => {
         const query = req.query.query;
 
