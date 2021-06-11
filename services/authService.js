@@ -41,10 +41,10 @@ class AuthService {
 
     async auth(req, res) {
         const user = await User.findOne({ _id: req.user.id }).select('-password');
-        const toke = jwt.sign({ id: user.id }, config.get('secretKey'), {
+        const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
             expiresIn: '100h',
         });
-        
+
         return { token, user };
     }
 
@@ -52,7 +52,7 @@ class AuthService {
         const hash = req.query.hash;
 
         if (!hash) return res.status(422).json({ errors: 'Invalid hash!' });
-    
+
         const user = await User.findOne({ confirm_hash: hash }).exec();
 
         if (!user) {
@@ -60,13 +60,40 @@ class AuthService {
                 status: 'error',
                 message: 'Hash not found',
             });
-        } 
+        }
 
         user.confirmed = true;
         user.save();
         res.json({
             status: 'success',
             message: 'Аккаунт успешно подтвержден!',
+        });
+    }
+
+    async login(req, res) {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+   
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isPassValid = bcrypt.compareSync(password, user.password);
+
+        const token = jwt.sign({ id: user.id }, config.get('secretKey'), {
+            expiresIn: '1h',
+        });
+
+        if (isPassValid) {
+            return {
+                token,
+                user,
+            };
+        }
+
+        res.json({
+            status: 'error',
+            message: 'Incorrect password or email',
         });
     }
 }
