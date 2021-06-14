@@ -29,8 +29,12 @@ class AuthController {
     }
 
     async auth(req, res) {
-        const { token, user } = await this.authService.auth(req, res);
-        return res.json({ token, user });
+        try {
+            const { token, user } = await this.authService.auth(req, res);
+            return res.json({ token, user });
+        } catch (error) {
+            console.log(e);
+        }
     }
 }
 

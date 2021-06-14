@@ -14,7 +14,6 @@ class AuthService {
         const candidate = await User.findOne({ email, name });
 
         if (candidate) {
-
             return res
                 .status(400)
                 .json({ message: `User with email ${email} alredy exist` });

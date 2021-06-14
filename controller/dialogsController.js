@@ -21,7 +21,7 @@ class DialogController {
                 },
             })
             .exec((err, dialogs) => {
-                console.log(dialogs);
+               
                 if (err) {
                     res.status(404).json({
                         message: 'Dialogs not found',
