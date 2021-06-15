@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const User = require('../models/User');
-const path = require("path");
-const Uuid = require("uuid");
+const path = require('path');
+const Uuid = require('uuid');
+const TeacherCourse = require('../models/TeacherCourse');
 
 class UserService {
     async update(req, res) {
@@ -64,7 +65,6 @@ class UserService {
     }
 
     async uploadAvatar(req, res) {
-        try {
             const file = req.files.file;
 
             const avatarName = Uuid.v4() + '.jpg';
@@ -81,28 +81,20 @@ class UserService {
 
             user.avatar = avatarName;
             await user.save();
-            console.log(token);
+
             return {
                 token,
                 user,
             };
-        } catch (error) {
-            console.log('аватар')
-        }
     }
 
     async findUsers(req, res) {
         const query = req.query.query;
-        // Доработать
+
         const users = await User.find({
-            $or([
-                { fullname: new RegExp(query, 'i') }
-            ])
-        })
-            // .or([
-            //     { fullname: new RegExp(query, 'i') },
-            //     { email: new RegExp(query, 'i') },
-            // ]);
+            email: { $regex: new RegExp(query, 'i') },
+           
+        });
         return users;
     };
 }

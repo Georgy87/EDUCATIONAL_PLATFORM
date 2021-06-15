@@ -5,6 +5,7 @@ const loginValidation = require('../utils/validations/validations.middleware');
 const lastSeenMiddleware = require('../middleware/updateLastSeen.middleware');
 const authMiddleWare = require('../middleware/auth.middleware');
 
+
 router.post('/registration', loginValidation, AuthController.registration.bind(AuthController));
 router.get('/verify',  AuthController.verify.bind(AuthController));
 router.post('/login', AuthController.login.bind(AuthController));

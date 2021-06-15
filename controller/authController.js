@@ -1,4 +1,4 @@
-const AuthService = require('../services/authService');
+const AuthService = require("../services/authService");
 class AuthController {
     constructor() {
         this.authService = AuthService;

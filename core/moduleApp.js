@@ -29,13 +29,13 @@ module.exports.createUseApp = (app, io) => {
     app.use("/api/teacher", courseRouter);
     app.use("/api/teacher", courseContentRouter);
 
-    // app.use(function (err, req, res, next) {
-    //     if (err) {
-    //         return console.log('Иди');
-    //     }
+    app.use(async function(err, req, res, next) {
+        if (err) {
+            return console.log('Ошибка');
+        }
        
-    //     return res.status(500).send('Something broke!');
-    // });
+        return res.status(500).send('Something broke!');
+    });
 
     // Доработать
 
